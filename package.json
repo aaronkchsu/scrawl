@@ -1,0 +1,14 @@
+{
+  "name": "scrawl-collective-doodle-battle",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24.0.0" },
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env --watch server.ts",
+    "start": "node --env-file-if-exists=.env server.ts",
+    "test": "node --test tests/*.test.ts",
+    "check": "tsc --noEmit"
+  },
+  "devDependencies": { "typescript": "^5.9.3", "@types/node": "^24.0.0" }
+}
