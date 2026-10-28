@@ -1,0 +1,1193 @@
+{
+  "manualTestMessages": true,
+  "state": {
+    "id": "1db83674-ffa4-4a20-8ff2-441f485ff7cd",
+    "revision": 93,
+    "mode": "ai",
+    "phase": "finished",
+    "round": 2,
+    "maxRounds": 2,
+    "approaches": [
+      {
+        "id": "ground",
+        "label": "Ground it",
+        "capability": "ground",
+        "tool": "wire",
+        "impact": 35,
+        "defense": 0,
+        "description": "A conductive wire to earth. 35 impact."
+      },
+      {
+        "id": "reflect",
+        "label": "Reflect it",
+        "capability": "reflect",
+        "tool": "mirror",
+        "impact": 35,
+        "defense": 0,
+        "description": "A reflective surface. 35 impact."
+      },
+      {
+        "id": "shield",
+        "label": "Shelter",
+        "capability": "shield",
+        "tool": "umbrella",
+        "impact": 18,
+        "defense": 12,
+        "description": "An insulating barrier. 18 impact; blocks 12 damage."
+      }
+    ],
+    "finisher": {
+      "name": "THE COLLECTIVE FINISHER",
+      "components": [
+        {
+          "team": "a",
+          "name": "Sir Steep ’n’ Squeak, Earl of Earth",
+          "lead": "the teapot knight drags a copper cable connected to a ground spike"
+        },
+        {
+          "team": "b",
+          "name": "The Drizzle Custodian: Pan Department",
+          "lead": "the hermit crab holds a huge reflective frying pan"
+        }
+      ]
+    },
+    "deadline": null,
+    "remainingMs": 0,
+    "paused": false,
+    "error": null,
+    "winner": "tie",
+    "boss": {
+      "name": "The Inkling",
+      "health": 0,
+      "maxHealth": 130,
+      "cue": "A stolen storm cloud. Ground, reflect, or shelter.",
+      "weakness": "ground"
+    },
+    "teams": {
+      "a": {
+        "id": "a",
+        "name": "The Doodle Ducks",
+        "color": "#ee7544",
+        "health": 52,
+        "score": 82,
+        "messages": [
+          {
+            "team": "a",
+            "name": "ivy",
+            "text": "the teapot knight drags a copper cable connected to a ground spike",
+            "approach": "ground",
+            "id": "bc861d788f6a2417077a1f90",
+            "userId": "manual-ivy",
+            "source": "manual",
+            "at": 1793128354778
+          },
+          {
+            "team": "a",
+            "name": "moss",
+            "text": "keep the squeaky roller skates",
+            "approach": "ground",
+            "id": "8ac0daa645b9c52f75cd6eae",
+            "userId": "manual-moss",
+            "source": "manual",
+            "at": 1793128354780
+          },
+          {
+            "team": "a",
+            "name": "sky",
+            "text": "a copper spoon arm touching earth",
+            "approach": "ground",
+            "id": "0efcf87d39835861419b3e12",
+            "userId": "manual-sky",
+            "source": "manual",
+            "at": 1793128354780
+          }
+        ],
+        "nominationCount": 3,
+        "finalists": [
+          {
+            "id": "1",
+            "message": {
+              "team": "a",
+              "name": "ivy",
+              "text": "the teapot knight drags a copper cable connected to a ground spike",
+              "approach": "ground",
+              "id": "bc861d788f6a2417077a1f90",
+              "userId": "manual-ivy",
+              "source": "manual",
+              "at": 1793128354778
+            },
+            "approach": {
+              "id": "ground",
+              "label": "Ground it",
+              "capability": "ground",
+              "tool": "wire",
+              "impact": 35,
+              "defense": 0,
+              "description": "A conductive wire to earth. 35 impact."
+            },
+            "votes": 3
+          },
+          {
+            "id": "2",
+            "message": {
+              "team": "a",
+              "name": "moss",
+              "text": "keep the squeaky roller skates",
+              "approach": "ground",
+              "id": "8ac0daa645b9c52f75cd6eae",
+              "userId": "manual-moss",
+              "source": "manual",
+              "at": 1793128354780
+            },
+            "approach": {
+              "id": "ground",
+              "label": "Ground it",
+              "capability": "ground",
+              "tool": "wire",
+              "impact": 35,
+              "defense": 0,
+              "description": "A conductive wire to earth. 35 impact."
+            },
+            "votes": 0
+          },
+          {
+            "id": "3",
+            "message": {
+              "team": "a",
+              "name": "sky",
+              "text": "a copper spoon arm touching earth",
+              "approach": "ground",
+              "id": "0efcf87d39835861419b3e12",
+              "userId": "manual-sky",
+              "source": "manual",
+              "at": 1793128354780
+            },
+            "approach": {
+              "id": "ground",
+              "label": "Ground it",
+              "capability": "ground",
+              "tool": "wire",
+              "impact": 35,
+              "defense": 0,
+              "description": "A conductive wire to earth. 35 impact."
+            },
+            "votes": 0
+          }
+        ],
+        "selectedId": "1",
+        "voterCount": 3,
+        "creation": {
+          "name": "Sir Steep ’n’ Squeak, Earl of Earth",
+          "description": "The teapot knight returns on squeaky roller skates, dragging a copper grounding cable and planting his copper spoon hand in the dirt. His sponge cape remains spectacularly overdressed.",
+          "body": "A crooked cream teapot with a visor-like gaze, an enormous p",
+          "features": [
+            "Copper cable visibly connects the teapot body to a spike in",
+            "Squeaky roller skates with mismatched wheels",
+            "Copper spoon arm with its bowl pressed into earth",
+            "Returning sponge cape and springy spoon-arm joint"
+          ],
+          "capabilities": [
+            "ground",
+            "move"
+          ],
+          "contributions": [
+            {
+              "messageId": "bc861d788f6a2417077a1f90",
+              "name": "ivy",
+              "feature": "Copper grounding cable attached to the teapot and a spike driven into soil"
+            },
+            {
+              "messageId": "8ac0daa645b9c52f75cd6eae",
+              "name": "moss",
+              "feature": "Two squeaky roller skates with little vibration marks"
+            },
+            {
+              "messageId": "0efcf87d39835861419b3e12",
+              "name": "sky",
+              "feature": "Copper spoon arm whose bowl touches the earth"
+            }
+          ],
+          "shapes": [
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M 31 299 Q 96 292 164 300 T 371 297 L 370 325 L 30 325 Z",
+              "fill": "#8baea0",
+              "layer": "feet"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M 110 113 Q 66 105 58 141 L 43 252 Q 77 240 98 259 L 132 217 Z",
+              "fill": "#f9d45c",
+              "layer": "body"
+            },
+            {
+              "kind": "ellipse",
+              "x": 79,
+              "y": 150,
+              "w": 13,
+              "h": 19,
+              "angle": -13,
+              "path": "",
+              "fill": "#f3a476",
+              "layer": "body"
+            },
+            {
+              "kind": "ellipse",
+              "x": 69,
+              "y": 195,
+              "w": 17,
+              "h": 12,
+              "angle": 12,
+              "path": "",
+              "fill": "#f3a476",
+              "layer": "body"
+            },
+            {
+              "kind": "ellipse",
+              "x": 87,
+              "y": 227,
+              "w": 11,
+              "h": 16,
+              "angle": 20,
+              "path": "",
+              "fill": "#f3a476",
+              "layer": "body"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M 114 142 C 60 111 62 212 112 203 L 119 183 C 86 198 87 140 113 162 Z",
+              "fill": "#f7f2e6",
+              "layer": "body"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M 207 151 L 244 136 L 262 110 L 278 120 Q 266 172 224 188 Z",
+              "fill": "#f7f2e6",
+              "layer": "body"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M 112 119 Q 160 100 207 123 L 226 199 Q 219 243 169 245 Q 109 246 101 204 Z",
+              "fill": "#f7f2e6",
+              "layer": "body"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M 106 120 Q 152 83 211 119 L 211 128 L 107 130 Z",
+              "fill": "#6f89c7",
+              "layer": "body"
+            },
+            {
+              "kind": "ellipse",
+              "x": 159,
+              "y": 92,
+              "w": 22,
+              "h": 17,
+              "angle": -6,
+              "path": "",
+              "fill": "#f9d45c",
+              "layer": "body"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M 121 151 L 199 146 L 202 181 L 119 186 Z",
+              "fill": "#202936",
+              "layer": "body"
+            },
+            {
+              "kind": "ellipse",
+              "x": 142,
+              "y": 166,
+              "w": 16,
+              "h": 20,
+              "angle": -8,
+              "path": "",
+              "fill": "#f7f2e6",
+              "layer": "body"
+            },
+            {
+              "kind": "ellipse",
+              "x": 180,
+              "y": 163,
+              "w": 17,
+              "h": 20,
+              "angle": 8,
+              "path": "",
+              "fill": "#f7f2e6",
+              "layer": "body"
+            },
+            {
+              "kind": "ellipse",
+              "x": 147,
+              "y": 169,
+              "w": 6,
+              "h": 8,
+              "angle": 0,
+              "path": "",
+              "fill": "#202936",
+              "layer": "body"
+            },
+            {
+              "kind": "ellipse",
+              "x": 185,
+              "y": 166,
+              "w": 6,
+              "h": 8,
+              "angle": 0,
+              "path": "",
+              "fill": "#202936",
+              "layer": "body"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M 147 207 Q 166 218 184 201",
+              "fill": "none",
+              "layer": "body"
+            },
+            {
+              "kind": "line",
+              "x": 133,
+              "y": 239,
+              "w": -7,
+              "h": 27,
+              "angle": 0,
+              "path": "",
+              "fill": "none",
+              "layer": "feet"
+            },
+            {
+              "kind": "line",
+              "x": 193,
+              "y": 239,
+              "w": 12,
+              "h": 28,
+              "angle": 0,
+              "path": "",
+              "fill": "none",
+              "layer": "feet"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M 112 260 L 135 262 L 141 273 L 157 275 L 155 285 L 107 282 Z",
+              "fill": "#6f89c7",
+              "layer": "feet"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M 193 262 L 214 261 L 219 273 L 239 276 L 237 286 L 189 284 Z",
+              "fill": "#6f89c7",
+              "layer": "feet"
+            },
+            {
+              "kind": "ellipse",
+              "x": 117,
+              "y": 289,
+              "w": 16,
+              "h": 17,
+              "angle": 0,
+              "path": "",
+              "fill": "#d995a8",
+              "layer": "feet"
+            },
+            {
+              "kind": "ellipse",
+              "x": 145,
+              "y": 291,
+              "w": 17,
+              "h": 16,
+              "angle": 0,
+              "path": "",
+              "fill": "#f9d45c",
+              "layer": "feet"
+            },
+            {
+              "kind": "ellipse",
+              "x": 199,
+              "y": 291,
+              "w": 16,
+              "h": 17,
+              "angle": 0,
+              "path": "",
+              "fill": "#f9d45c",
+              "layer": "feet"
+            },
+            {
+              "kind": "ellipse",
+              "x": 228,
+              "y": 291,
+              "w": 17,
+              "h": 16,
+              "angle": 0,
+              "path": "",
+              "fill": "#d995a8",
+              "layer": "feet"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M 95 267 L 87 260 M 94 278 L 83 279 M 247 268 L 254 260 M 249 280 L 260 282",
+              "fill": "none",
+              "layer": "feet"
+            },
+            {
+              "kind": "ellipse",
+              "x": 217,
+              "y": 202,
+              "w": 17,
+              "h": 18,
+              "angle": 0,
+              "path": "",
+              "fill": "#f3a476",
+              "layer": "tool"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M 224 201 L 238 209 L 231 217 L 248 223 L 242 231 L 257 238",
+              "fill": "none",
+              "layer": "tool"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M 253 235 L 260 231 L 292 283 L 286 289 Z",
+              "fill": "#f3a476",
+              "layer": "tool"
+            },
+            {
+              "kind": "ellipse",
+              "x": 296,
+              "y": 294,
+              "w": 31,
+              "h": 16,
+              "angle": 12,
+              "path": "",
+              "fill": "#f3a476",
+              "layer": "tool"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M 277 302 L 291 301 L 306 304 L 316 300",
+              "fill": "none",
+              "layer": "tool"
+            },
+            {
+              "kind": "ellipse",
+              "x": 110,
+              "y": 211,
+              "w": 12,
+              "h": 13,
+              "angle": 0,
+              "path": "",
+              "fill": "#f3a476",
+              "layer": "tool"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M 109 211 C 76 220 35 268 65 287 C 90 303 89 256 63 274 C 42 291 98 313 160 309 C 231 305 287 318 345 286 L 348 289 C 288 323 231 311 160 315 C 93 319 32 295 59 270 C 90 247 104 303 63 293 C 25 280 70 217 108 207 Z",
+              "fill": "#f3a476",
+              "layer": "tool"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M 340 271 L 353 273 L 347 317 L 343 323 L 340 315 Z",
+              "fill": "#f3a476",
+              "layer": "tool"
+            },
+            {
+              "kind": "ellipse",
+              "x": 347,
+              "y": 270,
+              "w": 22,
+              "h": 7,
+              "angle": 8,
+              "path": "",
+              "fill": "#f3a476",
+              "layer": "tool"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M 333 308 L 339 304 M 354 305 L 363 309 M 335 320 L 330 323 M 355 319 L 361 322",
+              "fill": "none",
+              "layer": "tool"
+            }
+          ],
+          "origin": "ai",
+          "generationMs": 26154
+        },
+        "braces": [],
+        "result": "Ground it: 41 impact (+6 community combo) · 24 damage taken. Votes choose the idea; they never multiply power.",
+        "lastDamage": 41,
+        "channel": null,
+        "connection": "offline",
+        "connectionNote": "Connect a Twitch channel when you’re ready."
+      },
+      "b": {
+        "id": "b",
+        "name": "The Scribble Society",
+        "color": "#4668d9",
+        "health": 52,
+        "score": 82,
+        "messages": [
+          {
+            "team": "b",
+            "name": "kelp",
+            "text": "the hermit crab holds a huge reflective frying pan",
+            "approach": "reflect",
+            "id": "f461224679a27c91dd4aa0c8",
+            "userId": "manual-kelp",
+            "source": "manual",
+            "at": 1793128354781
+          },
+          {
+            "team": "b",
+            "name": "reed",
+            "text": "keep the tiny rain boots",
+            "approach": "reflect",
+            "id": "fd3245758377ccba82bff599",
+            "userId": "manual-reed",
+            "source": "manual",
+            "at": 1793128354782
+          },
+          {
+            "team": "b",
+            "name": "fern",
+            "text": "a noodle arm polishes the reflective pan",
+            "approach": "reflect",
+            "id": "bdfc5102646f34900b288e85",
+            "userId": "manual-fern",
+            "source": "manual",
+            "at": 1793128354783
+          }
+        ],
+        "nominationCount": 3,
+        "finalists": [
+          {
+            "id": "1",
+            "message": {
+              "team": "b",
+              "name": "fern",
+              "text": "a noodle arm polishes the reflective pan",
+              "approach": "reflect",
+              "id": "bdfc5102646f34900b288e85",
+              "userId": "manual-fern",
+              "source": "manual",
+              "at": 1793128354783
+            },
+            "approach": {
+              "id": "reflect",
+              "label": "Reflect it",
+              "capability": "reflect",
+              "tool": "mirror",
+              "impact": 35,
+              "defense": 0,
+              "description": "A reflective surface. 35 impact."
+            },
+            "votes": 0
+          },
+          {
+            "id": "2",
+            "message": {
+              "team": "b",
+              "name": "reed",
+              "text": "keep the tiny rain boots",
+              "approach": "reflect",
+              "id": "fd3245758377ccba82bff599",
+              "userId": "manual-reed",
+              "source": "manual",
+              "at": 1793128354782
+            },
+            "approach": {
+              "id": "reflect",
+              "label": "Reflect it",
+              "capability": "reflect",
+              "tool": "mirror",
+              "impact": 35,
+              "defense": 0,
+              "description": "A reflective surface. 35 impact."
+            },
+            "votes": 0
+          },
+          {
+            "id": "3",
+            "message": {
+              "team": "b",
+              "name": "kelp",
+              "text": "the hermit crab holds a huge reflective frying pan",
+              "approach": "reflect",
+              "id": "f461224679a27c91dd4aa0c8",
+              "userId": "manual-kelp",
+              "source": "manual",
+              "at": 1793128354781
+            },
+            "approach": {
+              "id": "reflect",
+              "label": "Reflect it",
+              "capability": "reflect",
+              "tool": "mirror",
+              "impact": 35,
+              "defense": 0,
+              "description": "A reflective surface. 35 impact."
+            },
+            "votes": 30
+          }
+        ],
+        "selectedId": "3",
+        "voterCount": 30,
+        "creation": {
+          "name": "The Drizzle Custodian: Pan Department",
+          "description": "Still hauling its open glass jar in tiny rain boots, the hermit crab has acquired a frying pan almost larger than its job description. One noodly arm keeps the reflective surface obsessively polished.",
+          "body": "A squat peach-colored hermit crab carries a crooked glass-­­",
+          "features": [
+            "An enormous reflective frying pan held upright by a crab's p",
+            "An implausibly long noodle arm rubbing a polishing cloth",
+            "Tiny yellow rain boots beneath a jar-hauling crab"
+          ],
+          "capabilities": [
+            "reflect"
+          ],
+          "contributions": [
+            {
+              "messageId": "f461224679a27c91dd4aa0c8",
+              "name": "kelp",
+              "feature": "The crab holds an enormous reflective frying pan with a bright exposed face."
+            },
+            {
+              "messageId": "bdfc5102646f34900b288e85",
+              "name": "fern",
+              "feature": "A looping noodle arm presses a pink polishing cloth against the pan."
+            },
+            {
+              "messageId": "fd3245758377ccba82bff599",
+              "name": "reed",
+              "feature": "The crab retains its tiny yellow rain boots."
+            }
+          ],
+          "shapes": [
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M113 278 L103 298 L87 299 M146 279 L143 302 M182 279 L190 301 M212 268 L225 295",
+              "fill": "none",
+              "layer": "feet"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M91 292 L105 294 L105 311 Q91 318 76 312 L77 304 L90 303 Z",
+              "fill": "#f9d45c",
+              "layer": "feet"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M134 295 L148 295 L150 313 L126 315 L123 307 L134 305 Z",
+              "fill": "#f9d45c",
+              "layer": "feet"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M182 295 L195 293 L198 304 L210 307 L209 316 L184 315 Z",
+              "fill": "#f9d45c",
+              "layer": "feet"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M217 290 L230 289 L232 300 L243 303 L243 311 L220 312 Z",
+              "fill": "#f9d45c",
+              "layer": "feet"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M91 78 L96 198 Q100 223 148 220 Q198 222 204 199 L208 78 Z",
+              "fill": "#f7f2e6",
+              "layer": "body"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M99 171 Q122 165 148 174 Q175 181 199 169 L197 198 Q180 213 148 210 Q112 212 104 198 Z",
+              "fill": "#8baea0",
+              "layer": "body"
+            },
+            {
+              "kind": "ellipse",
+              "x": 149,
+              "y": 78,
+              "w": 119,
+              "h": 27,
+              "angle": -2,
+              "path": "",
+              "fill": "#f7f2e6",
+              "layer": "body"
+            },
+            {
+              "kind": "ellipse",
+              "x": 149,
+              "y": 77,
+              "w": 102,
+              "h": 14,
+              "angle": -2,
+              "path": "",
+              "fill": "#202936",
+              "layer": "body"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M111 99 L115 151 M186 100 L184 135",
+              "fill": "none",
+              "layer": "body"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M102 190 Q143 180 193 196 L191 213 Q143 198 105 209 Z",
+              "fill": "#f9d45c",
+              "layer": "body"
+            },
+            {
+              "kind": "ellipse",
+              "x": 156,
+              "y": 246,
+              "w": 139,
+              "h": 77,
+              "angle": -5,
+              "path": "",
+              "fill": "#f3a476",
+              "layer": "body"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M101 241 Q74 237 65 219 L51 222",
+              "fill": "none",
+              "layer": "body"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M64 221 Q39 237 29 218 Q21 201 39 192 L42 210 L56 195 Q72 202 64 221 Z",
+              "fill": "#f3a476",
+              "layer": "body"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M127 220 L121 196 M171 216 L176 190",
+              "fill": "none",
+              "layer": "body"
+            },
+            {
+              "kind": "ellipse",
+              "x": 120,
+              "y": 191,
+              "w": 27,
+              "h": 32,
+              "angle": -10,
+              "path": "",
+              "fill": "#f7f2e6",
+              "layer": "body"
+            },
+            {
+              "kind": "ellipse",
+              "x": 177,
+              "y": 186,
+              "w": 29,
+              "h": 34,
+              "angle": 9,
+              "path": "",
+              "fill": "#f7f2e6",
+              "layer": "body"
+            },
+            {
+              "kind": "ellipse",
+              "x": 126,
+              "y": 191,
+              "w": 10,
+              "h": 14,
+              "angle": 0,
+              "path": "",
+              "fill": "#202936",
+              "layer": "body"
+            },
+            {
+              "kind": "ellipse",
+              "x": 183,
+              "y": 187,
+              "w": 10,
+              "h": 14,
+              "angle": 0,
+              "path": "",
+              "fill": "#202936",
+              "layer": "body"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M135 244 Q155 263 176 241",
+              "fill": "none",
+              "layer": "body"
+            },
+            {
+              "kind": "ellipse",
+              "x": 114,
+              "y": 238,
+              "w": 13,
+              "h": 7,
+              "angle": -8,
+              "path": "",
+              "fill": "#d995a8",
+              "layer": "body"
+            },
+            {
+              "kind": "rect",
+              "x": 269,
+              "y": 170,
+              "w": 19,
+              "h": 106,
+              "angle": 15,
+              "path": "",
+              "fill": "#202936",
+              "layer": "tool"
+            },
+            {
+              "kind": "ellipse",
+              "x": 249,
+              "y": 263,
+              "w": 7,
+              "h": 11,
+              "angle": 15,
+              "path": "",
+              "fill": "#f7f2e6",
+              "layer": "tool"
+            },
+            {
+              "kind": "ellipse",
+              "x": 281,
+              "y": 116,
+              "w": 149,
+              "h": 153,
+              "angle": -7,
+              "path": "",
+              "fill": "#202936",
+              "layer": "tool"
+            },
+            {
+              "kind": "ellipse",
+              "x": 281,
+              "y": 115,
+              "w": 134,
+              "h": 137,
+              "angle": -7,
+              "path": "",
+              "fill": "#6f89c7",
+              "layer": "tool"
+            },
+            {
+              "kind": "ellipse",
+              "x": 281,
+              "y": 114,
+              "w": 119,
+              "h": 123,
+              "angle": -7,
+              "path": "",
+              "fill": "#f7f2e6",
+              "layer": "tool"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M236 115 Q246 76 280 67 M258 153 L313 95 M280 155 L325 108",
+              "fill": "none",
+              "layer": "tool"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M206 245 Q231 251 246 228 L260 214",
+              "fill": "none",
+              "layer": "body"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M248 218 Q245 201 261 199 L265 214 L279 201 Q291 219 273 230 Q259 236 248 218 Z",
+              "fill": "#f3a476",
+              "layer": "body"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M93 252 C48 274 43 159 67 136 C86 118 106 151 87 164 C66 181 65 100 102 103 C154 108 156 152 229 138 L241 126 L250 136 Q239 153 214 152 C151 166 142 117 107 116 C85 117 88 144 92 150 C100 138 89 133 81 143 C63 168 68 251 94 240 Z",
+              "fill": "#f3a476",
+              "layer": "body"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M232 118 L253 111 L268 124 L260 146 L239 143 L227 131 Z",
+              "fill": "#d995a8",
+              "layer": "tool"
+            },
+            {
+              "kind": "path",
+              "x": 0,
+              "y": 0,
+              "w": 0,
+              "h": 0,
+              "angle": 0,
+              "path": "M239 124 L250 133 L258 125 M277 91 L277 79 M271 85 L284 85 M316 147 L316 137 M311 142 L322 142",
+              "fill": "none",
+              "layer": "tool"
+            }
+          ],
+          "origin": "ai",
+          "generationMs": 27990
+        },
+        "braces": [],
+        "result": "Reflect it: 41 impact (+6 community combo) · 24 damage taken. Votes choose the idea; they never multiply power.",
+        "lastDamage": 41,
+        "channel": null,
+        "connection": "offline",
+        "connectionNote": "Connect a Twitch channel when you’re ready."
+      }
+    },
+    "log": [
+      {
+        "id": 12,
+        "text": "One monster. Two communities. Each gets one invention per round.",
+        "at": 1793128313897
+      },
+      {
+        "id": 13,
+        "text": "Up to three sampled finalists per community. Vote for the lead; the others add visual details. Ties are drawn at random.",
+        "at": 1793128313904
+      },
+      {
+        "id": 14,
+        "text": "One invention each. Different audience sizes, the same upgrade budget.",
+        "at": 1793128340531
+      },
+      {
+        "id": 15,
+        "text": "Community combo! One invention soaks while the other catches. +6 impact each.",
+        "at": 1793128346660
+      },
+      {
+        "id": 16,
+        "text": "82 combined impact. The Inkling is reconsidering its choices.",
+        "at": 1793128346660
+      },
+      {
+        "id": 17,
+        "text": "The Inkling stole a storm cloud. Adapt your inventions!",
+        "at": 1793128354692
+      },
+      {
+        "id": 18,
+        "text": "Up to three sampled finalists per community. Vote for the lead; the others add visual details. Ties are drawn at random.",
+        "at": 1793128354784
+      },
+      {
+        "id": 19,
+        "text": "One invention each. Different audience sizes, the same upgrade budget.",
+        "at": 1793128382804
+      },
+      {
+        "id": 20,
+        "text": "Community combo! One invention reflects into the other’s grounding path. +6 impact each.",
+        "at": 1793128388840
+      },
+      {
+        "id": 21,
+        "text": "82 combined impact. Both communities out-doodled the monster!",
+        "at": 1793128388840
+      },
+      {
+        "id": 22,
+        "text": "Two inventions. One finishing move. Both communities own this victory.",
+        "at": 1793128396880
+      },
+      {
+        "id": 23,
+        "text": "Shared victory. Two communities, one wonderfully bad idea.",
+        "at": 1793128527281
+      }
+    ],
+    "startedAt": 1793128313897,
+    "autoDemo": false
+  },
+  "now": 1793128527319,
+  "capabilities": {
+    "ai": {
+      "configured": true,
+      "model": "gpt-6.1-sol",
+      "requests": 10,
+      "maxRequests": 14,
+      "reportedRequests": 7,
+      "unreportedRequests": 3,
+      "inputTokens": 5252,
+      "outputTokens": 14831
+    },
+    "twitch": false
+  },
+  "authenticated": false
+}

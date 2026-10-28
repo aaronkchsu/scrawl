@@ -1,0 +1,445 @@
+{
+  "state": {
+    "id": "973b3b24-194f-4f4f-9ab3-6d5e81c29067",
+    "revision": 30,
+    "mode": "demo",
+    "phase": "finishing",
+    "round": 2,
+    "maxRounds": 2,
+    "approaches": [
+      {
+        "id": "ground",
+        "label": "Ground it",
+        "capability": "ground",
+        "tool": "wire",
+        "impact": 35,
+        "defense": 0,
+        "description": "A conductive wire to earth. 35 impact."
+      },
+      {
+        "id": "reflect",
+        "label": "Reflect it",
+        "capability": "reflect",
+        "tool": "mirror",
+        "impact": 35,
+        "defense": 0,
+        "description": "A reflective surface. 35 impact."
+      },
+      {
+        "id": "shield",
+        "label": "Shelter",
+        "capability": "shield",
+        "tool": "umbrella",
+        "impact": 18,
+        "defense": 12,
+        "description": "An insulating barrier. 18 impact; blocks 12 damage."
+      }
+    ],
+    "finisher": {
+      "name": "THE COLLECTIVE FINISHER",
+      "components": [
+        {
+          "team": "a",
+          "name": "Professor Quack",
+          "lead": "a duck on wheels with a trailing copper cable"
+        },
+        {
+          "team": "b",
+          "name": "The Questionable Appliance",
+          "lead": "a robot with a reflective frying pan shield"
+        }
+      ]
+    },
+    "deadline": 1793128218769,
+    "remainingMs": 5000,
+    "paused": false,
+    "error": null,
+    "winner": null,
+    "boss": {
+      "name": "The Inkling",
+      "health": 0,
+      "maxHealth": 130,
+      "cue": "A stolen storm cloud. Ground, reflect, or shelter.",
+      "weakness": "ground"
+    },
+    "teams": {
+      "a": {
+        "id": "a",
+        "name": "The Doodle Ducks",
+        "color": "#ee7544",
+        "health": 52,
+        "score": 82,
+        "messages": [
+          {
+            "team": "a",
+            "name": "mossboss",
+            "text": "a duck with a copper grounding tail touching earth",
+            "approach": "ground",
+            "id": "ab7e31cb7e3099cc13c0a2a0",
+            "userId": "manual-mossboss",
+            "source": "manual",
+            "at": 1793128199415
+          },
+          {
+            "team": "a",
+            "name": "tinywizard",
+            "text": "a frog dragging a grounding wire",
+            "approach": "ground",
+            "id": "1aacb3087b3180af8ed03b1e",
+            "userId": "manual-tinywizard",
+            "source": "manual",
+            "at": 1793128199417
+          },
+          {
+            "team": "a",
+            "name": "noodleclub",
+            "text": "a duck on wheels with a trailing copper cable",
+            "approach": "ground",
+            "id": "1a48ff37a37a90747f86f697",
+            "userId": "manual-noodleclub",
+            "source": "manual",
+            "at": 1793128199419
+          }
+        ],
+        "nominationCount": 3,
+        "finalists": [
+          {
+            "id": "1",
+            "message": {
+              "team": "a",
+              "name": "noodleclub",
+              "text": "a duck on wheels with a trailing copper cable",
+              "approach": "ground",
+              "id": "1a48ff37a37a90747f86f697",
+              "userId": "manual-noodleclub",
+              "source": "manual",
+              "at": 1793128199419
+            },
+            "approach": {
+              "id": "ground",
+              "label": "Ground it",
+              "capability": "ground",
+              "tool": "wire",
+              "impact": 35,
+              "defense": 0,
+              "description": "A conductive wire to earth. 35 impact."
+            },
+            "votes": 1
+          },
+          {
+            "id": "2",
+            "message": {
+              "team": "a",
+              "name": "mossboss",
+              "text": "a duck with a copper grounding tail touching earth",
+              "approach": "ground",
+              "id": "ab7e31cb7e3099cc13c0a2a0",
+              "userId": "manual-mossboss",
+              "source": "manual",
+              "at": 1793128199415
+            },
+            "approach": {
+              "id": "ground",
+              "label": "Ground it",
+              "capability": "ground",
+              "tool": "wire",
+              "impact": 35,
+              "defense": 0,
+              "description": "A conductive wire to earth. 35 impact."
+            },
+            "votes": 0
+          },
+          {
+            "id": "3",
+            "message": {
+              "team": "a",
+              "name": "tinywizard",
+              "text": "a frog dragging a grounding wire",
+              "approach": "ground",
+              "id": "1aacb3087b3180af8ed03b1e",
+              "userId": "manual-tinywizard",
+              "source": "manual",
+              "at": 1793128199417
+            },
+            "approach": {
+              "id": "ground",
+              "label": "Ground it",
+              "capability": "ground",
+              "tool": "wire",
+              "impact": 35,
+              "defense": 0,
+              "description": "A conductive wire to earth. 35 impact."
+            },
+            "votes": 0
+          }
+        ],
+        "selectedId": "1",
+        "voterCount": 1,
+        "creation": {
+          "name": "Professor Quack",
+          "body": "duck",
+          "features": [
+            "wire",
+            "wheels"
+          ],
+          "capabilities": [
+            "ground"
+          ],
+          "description": "Duck + grounding wire + wheels. Chat made this.",
+          "contributions": [
+            {
+              "messageId": "1a48ff37a37a90747f86f697",
+              "name": "noodleclub",
+              "feature": "Lead: duck · Ground it"
+            },
+            {
+              "messageId": "ab7e31cb7e3099cc13c0a2a0",
+              "name": "mossboss",
+              "feature": "Visual detail: wire"
+            },
+            {
+              "messageId": "1aacb3087b3180af8ed03b1e",
+              "name": "tinywizard",
+              "feature": "Visual detail: wire"
+            }
+          ],
+          "shapes": [],
+          "origin": "demo",
+          "generationMs": 0
+        },
+        "braces": [],
+        "result": "Ground it: 41 impact (+6 community combo) · 24 damage taken. Votes choose the idea; they never multiply power.",
+        "lastDamage": 41,
+        "channel": null,
+        "connection": "offline",
+        "connectionNote": "Connect a Twitch channel when you’re ready."
+      },
+      "b": {
+        "id": "b",
+        "name": "The Scribble Society",
+        "color": "#4668d9",
+        "health": 52,
+        "score": 82,
+        "messages": [
+          {
+            "team": "b",
+            "name": "toastghost",
+            "text": "a robot holding an enormous mirror",
+            "approach": "reflect",
+            "id": "30ef23020ba16deb063583a4",
+            "userId": "manual-toastghost",
+            "source": "manual",
+            "at": 1793128199416
+          },
+          {
+            "team": "b",
+            "name": "pixelpigeon",
+            "text": "a cat with a mirrored disco helmet",
+            "approach": "reflect",
+            "id": "3dda3dfc5c0aa801406ea2ee",
+            "userId": "manual-pixelpigeon",
+            "source": "manual",
+            "at": 1793128199418
+          },
+          {
+            "team": "b",
+            "name": "orbitalbread",
+            "text": "a robot with a reflective frying pan shield",
+            "approach": "reflect",
+            "id": "b87efb2d43281f7d8287b9b9",
+            "userId": "manual-orbitalbread",
+            "source": "manual",
+            "at": 1793128199421
+          }
+        ],
+        "nominationCount": 3,
+        "finalists": [
+          {
+            "id": "1",
+            "message": {
+              "team": "b",
+              "name": "orbitalbread",
+              "text": "a robot with a reflective frying pan shield",
+              "approach": "reflect",
+              "id": "b87efb2d43281f7d8287b9b9",
+              "userId": "manual-orbitalbread",
+              "source": "manual",
+              "at": 1793128199421
+            },
+            "approach": {
+              "id": "reflect",
+              "label": "Reflect it",
+              "capability": "reflect",
+              "tool": "mirror",
+              "impact": 35,
+              "defense": 0,
+              "description": "A reflective surface. 35 impact."
+            },
+            "votes": 1
+          },
+          {
+            "id": "2",
+            "message": {
+              "team": "b",
+              "name": "pixelpigeon",
+              "text": "a cat with a mirrored disco helmet",
+              "approach": "reflect",
+              "id": "3dda3dfc5c0aa801406ea2ee",
+              "userId": "manual-pixelpigeon",
+              "source": "manual",
+              "at": 1793128199418
+            },
+            "approach": {
+              "id": "reflect",
+              "label": "Reflect it",
+              "capability": "reflect",
+              "tool": "mirror",
+              "impact": 35,
+              "defense": 0,
+              "description": "A reflective surface. 35 impact."
+            },
+            "votes": 0
+          },
+          {
+            "id": "3",
+            "message": {
+              "team": "b",
+              "name": "toastghost",
+              "text": "a robot holding an enormous mirror",
+              "approach": "reflect",
+              "id": "30ef23020ba16deb063583a4",
+              "userId": "manual-toastghost",
+              "source": "manual",
+              "at": 1793128199416
+            },
+            "approach": {
+              "id": "reflect",
+              "label": "Reflect it",
+              "capability": "reflect",
+              "tool": "mirror",
+              "impact": 35,
+              "defense": 0,
+              "description": "A reflective surface. 35 impact."
+            },
+            "votes": 0
+          }
+        ],
+        "selectedId": "1",
+        "voterCount": 1,
+        "creation": {
+          "name": "The Questionable Appliance",
+          "body": "robot",
+          "features": [
+            "mirror",
+            "umbrella"
+          ],
+          "capabilities": [
+            "reflect"
+          ],
+          "description": "Robot + mirror + umbrella. Chat made this.",
+          "contributions": [
+            {
+              "messageId": "b87efb2d43281f7d8287b9b9",
+              "name": "orbitalbread",
+              "feature": "Lead: robot · Reflect it"
+            },
+            {
+              "messageId": "3dda3dfc5c0aa801406ea2ee",
+              "name": "pixelpigeon",
+              "feature": "Visual detail: mirror"
+            },
+            {
+              "messageId": "30ef23020ba16deb063583a4",
+              "name": "toastghost",
+              "feature": "Visual detail: mirror"
+            }
+          ],
+          "shapes": [],
+          "origin": "demo",
+          "generationMs": 0
+        },
+        "braces": [],
+        "result": "Reflect it: 41 impact (+6 community combo) · 24 damage taken. Votes choose the idea; they never multiply power.",
+        "lastDamage": 41,
+        "channel": null,
+        "connection": "offline",
+        "connectionNote": "Connect a Twitch channel when you’re ready."
+      }
+    },
+    "log": [
+      {
+        "id": 1,
+        "text": "One monster. Two communities. Each gets one invention per round.",
+        "at": 1793128152398
+      },
+      {
+        "id": 2,
+        "text": "Up to three sampled finalists per community. Vote for the lead; the others add visual details. Ties are drawn at random.",
+        "at": 1793128154980
+      },
+      {
+        "id": 3,
+        "text": "One invention each. Different audience sizes, the same upgrade budget.",
+        "at": 1793128185285
+      },
+      {
+        "id": 4,
+        "text": "Community combo! One invention soaks while the other catches. +6 impact each.",
+        "at": 1793128191301
+      },
+      {
+        "id": 5,
+        "text": "82 combined impact. The Inkling is reconsidering its choices.",
+        "at": 1793128191301
+      },
+      {
+        "id": 6,
+        "text": "The Inkling stole a storm cloud. Adapt your inventions!",
+        "at": 1793128199335
+      },
+      {
+        "id": 7,
+        "text": "Up to three sampled finalists per community. Vote for the lead; the others add visual details. Ties are drawn at random.",
+        "at": 1793128199422
+      },
+      {
+        "id": 8,
+        "text": "One invention each. Different audience sizes, the same upgrade budget.",
+        "at": 1793128199425
+      },
+      {
+        "id": 9,
+        "text": "Community combo! One invention reflects into the other’s grounding path. +6 impact each.",
+        "at": 1793128205566
+      },
+      {
+        "id": 10,
+        "text": "82 combined impact. Both communities out-doodled the monster!",
+        "at": 1793128205566
+      },
+      {
+        "id": 11,
+        "text": "Two inventions. One finishing move. Both communities own this victory.",
+        "at": 1793128213769
+      }
+    ],
+    "startedAt": 1793128152398,
+    "autoDemo": false
+  },
+  "now": 1793128214469,
+  "capabilities": {
+    "ai": {
+      "configured": true,
+      "model": "gpt-6.1-sol",
+      "requests": 6,
+      "maxRequests": 14,
+      "reportedRequests": 3,
+      "unreportedRequests": 3,
+      "inputTokens": 2107,
+      "outputTokens": 6052
+    },
+    "twitch": false
+  },
+  "authenticated": false,
+  "manualTest": true
+}
