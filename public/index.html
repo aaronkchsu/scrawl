@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f6f2e8"><title>SCRAWL — Chat made this.</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/dashboard.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <a class="wordmark" href="#home" aria-label="Scrawl home"><span class="logo-doodle" aria-hidden="true">✳</span>SCRAWL<span class="wordmark-dot">.</span></a>
+  <span class="brand-note">Chat made this. Somehow.</span>
+  <div class="topbar-right"><span class="connection-pill" id="connection"><i></i>Connecting</span><button class="icon-button" id="sound" aria-pressed="false">Sound off</button><a href="#setup" class="quiet-link">Twitch setup</a></div>
+</header>
+<main>
+  <div id="connection-notice" class="notice" role="status" hidden>Connection lost. Controls will return when the server reconnects. Your saved rehearsal edits stay in this browser.</div>
+  <div id="app-error" class="error-banner" role="alert" hidden></div>
+  <form id="access-form" class="panel" hidden><h2>Unlock host controls</h2><label>Host control token<input id="access-token" type="password" autocomplete="current-password" required></label><button class="button dark">Unlock controls</button><p>OBS overlays do not need this token.</p></form>
+  <section id="home-view"></section>
+  <section id="rehearse-view" hidden></section>
+  <section id="setup-view" hidden></section>
+  <section id="encounter-view" hidden>
+    <div class="session-heading"><div><a href="#home" class="quiet-link">← Home</a><h1 id="session-title" tabindex="-1">Your encounter</h1><p id="session-note" class="muted"></p></div><button id="end-encounter" class="button secondary">End encounter</button></div>
+    <ol id="stepper" class="stepper" aria-label="Encounter steps"></ol>
+    <div class="encounter-layout">
+      <div class="encounter-content">
+        <section id="rehearsal-editor" aria-label="Both communities" hidden></section>
+        <section id="encounter-board" class="encounter" aria-label="Shared monster encounter">
+          <div class="encounter-top"><div class="encounter-label"><span class="live-dot"></span><span id="encounter-label">THE NOTEBOOK IS OPEN</span></div><div class="board-top-right"><span id="round-label"></span><a href="/overlay?team=a&preview=1" target="_blank" rel="noreferrer">Preview overlay ↗</a></div></div>
+          <div class="phase-strip"><div><span id="phase-kicker" class="eyebrow"></span><h2 id="phase-title"></h2></div><div class="countdown" id="countdown">✎</div></div>
+          <div class="boss-meter"><span>THE INKLING</span><div class="health-track"><div id="boss-health"></div></div><strong id="boss-hp">130 / 130</strong></div>
+          <div id="battle-stage" class="battle-stage"></div>
+          <div class="board-footer"><div><span id="instruction"></span></div><span id="mode-label" class="mode-label"></span></div>
+        </section>
+        <section id="communities" class="community-grid" aria-label="Drawings and contributor credits"></section>
+      </div>
+      <aside id="next-step" class="next-step" aria-label="Your next step"></aside>
+    </div>
+  </section>
+  <details class="technical" id="technical"><summary>Technical details &amp; host controls</summary><div id="technical-content"></div></details>
+  <footer class="page-footer"><span class="wordmark footer-wordmark">SCRAWL.</span><span>Two communities. One shared notebook.</span><span>Built with Codex.</span></footer>
+</main>
+<div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>
