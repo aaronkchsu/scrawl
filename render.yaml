@@ -9,7 +9,7 @@ services:
     plan: 0.5c-512mb
     numInstances: 1
     branch: main
-    autoDeployTrigger: checksPass
+    autoDeployTrigger: commit
     healthCheckPath: /health
     maxShutdownDelaySeconds: 30
     envVars:
