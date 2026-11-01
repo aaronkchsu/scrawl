@@ -2,6 +2,8 @@
 
 A small Twitch adventure. Viewers join as explorers, climb for loot, and choose whether to keep it or risk the summit. Linked communities send rescue ropes to each other. Both camps appear on each stream.
 
+**Hosted preview:** [Play a practice climb](https://scrawl-zcc6.onrender.com). The Render app and Postgres are live. Twitch signup is still being configured; practice uses simulated viewers and no paid AI.
+
 ## Try it locally
 
 Use Node 24, then:

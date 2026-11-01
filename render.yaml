@@ -21,6 +21,8 @@ services:
         generateValue: true
       - key: MAX_ACTIVE_ROOMS
         value: '10'
+      - key: HOSTING_MONTHLY_ESTIMATE_USD
+        value: '14.50'
       - key: AI_MAX_REQUESTS
         value: '14'
       - key: AI_INITIAL_REQUESTS
