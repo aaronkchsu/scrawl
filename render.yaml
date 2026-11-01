@@ -1,0 +1,47 @@
+# One coordinator and one durable database. No automatic paid previews or scaling.
+previews:
+  generation: off
+services:
+  - type: web
+    name: scrawl
+    runtime: docker
+    region: oregon
+    plan: 0.5c-512mb
+    numInstances: 1
+    branch: main
+    autoDeployTrigger: checksPass
+    healthCheckPath: /health
+    maxShutdownDelaySeconds: 30
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: scrawl-db
+          property: connectionString
+      - key: TOKEN_ENCRYPTION_KEY
+        generateValue: true
+      - key: MAX_ACTIVE_ROOMS
+        value: '10'
+      - key: AI_MAX_REQUESTS
+        value: '14'
+      - key: AI_INITIAL_REQUESTS
+        value: '13'
+      - key: AI_INITIAL_REPORTED
+        value: '10'
+      - key: AI_INITIAL_INPUT_TOKENS
+        value: '7327'
+      - key: AI_INITIAL_OUTPUT_TOKENS
+        value: '20229'
+      - key: TWITCH_CLIENT_ID
+        sync: false
+      - key: TWITCH_CLIENT_SECRET
+        sync: false
+# Add OPENAI_API_KEY and OPERATOR_TWITCH_IDS later only when enabling paid caves.
+# RENDER_EXTERNAL_URL supplies the callback origin after the first deployment.
+databases:
+  - name: scrawl-db
+    region: oregon
+    plan: 0.1c-256mb
+    diskSizeGB: 5
+    storageAutoscalingEnabled: false
+    postgresMajorVersion: '18'
+    ipAllowList: []
