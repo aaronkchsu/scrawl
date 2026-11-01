@@ -2,7 +2,7 @@
 
 A small Twitch adventure. Viewers join as explorers, climb for loot, and choose whether to keep it or risk the summit. Linked communities send rescue ropes to each other. Both camps appear on each stream.
 
-**Hosted preview:** [Play a practice climb](https://scrawl-zcc6.onrender.com). The Render app and Postgres are live. Twitch signup is still being configured; practice uses simulated viewers and no paid AI.
+**Hosted pilot:** [Open SCRAWL](https://scrawl-zcc6.onrender.com). Twitch sign-in, real chat commands, OBS rendering and saved loot have been verified with one channel. Two-channel live rescue testing remains outstanding. Practice uses simulated viewers and no paid AI.
 
 ## Try it locally
 

@@ -10,4 +10,6 @@ Keep one Node 24 TypeScript server and browser-native HTML/CSS/JS. The server ow
 
 Run npm run check and npm test after logic changes. Test persistence, queue fairness, held choices, duplicate events, reset/stale actions, Twitch reconnects, and save failures. Use browser QA for visible interactions, narrow layouts, and transparent overlays. Record actual evidence and limits in docs/build-log.md.
 
+Submission footage must also show how Codex was used. When capturing a clip, update docs/storyboard.md with its file, what it proves, the relevant Codex implementation/testing evidence, and any missing shots. Preserve actual prompts, changes, failures and fixes; distinguish development assistance from in-game AI and simulated practice from real Twitch delivery.
+
 Secrets stay on the server and out of git, logs, URLs, fixtures, screenshots, and browser bundles. Development binds loopback by default. The legacy local server requires CONTROL_TOKEN for remote control. Hosted mode uses Twitch sessions, room ownership checks and Postgres; never expose the legacy shared dashboard as public signup. OBS views are read-only. Keep the GitHub repository private until the user explicitly requests publication.
