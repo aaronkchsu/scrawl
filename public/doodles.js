@@ -51,28 +51,3 @@ export function monsterSVG(storm = false, defeated = false) {
   ${storm ? `<g class="storm-cloud">${path('M108 39 Q91 16 113 9 Q129 -10 146 5 Q166 -13 185 4 Q205 -4 215 14 Q243 22 222 41Z','#6f89c7')}${path('M160 43 L145 65 L162 63 L153 84 L181 56 L166 57 L179 39Z','#f9d45c')}</g>` : `${path('M147 61 L138 40 M171 52 L173 27 M195 64 L208 45')}`}
   </g>`;
 }
-
-const preview = id => ({ body: id === 'a' ? 'duck' : 'robot', features: id === 'a' ? ['sponge','wheels'] : ['umbrella','bucket'], origin:'demo' });
-export function stageSVG(state, perspective = 'a') {
-  const own = state.teams[perspective]; const other = state.teams[perspective === 'a' ? 'b' : 'a'];
-  const lobby = state.phase === 'lobby';
-  const creature = team => lobby ? preview(team.id) : team.creation;
-  const impact = state.phase === 'resolving';
-  const finishing = state.phase === 'finishing';
-  const defeated = ['finishing','finished'].includes(state.phase) && state.boss.health === 0;
-  const label = (team, x, local) => `<g transform="translate(${x} 432)"><rect x="-127" y="-19" width="254" height="39" rx="4" fill="${team.color}" opacity=".12"/><text y="5" text-anchor="middle" class="svg-team" fill="${ink}">${esc(team.name)}</text><text y="43" text-anchor="middle" class="svg-meta" fill="${ink}">${local ? 'YOUR COMMUNITY' : 'PARTNER COMMUNITY'}${lobby ? '' : ` · ${team.score} IMPACT`}</text></g>`;
-  return `<svg class="battle-svg ${impact ? 'is-attacking' : ''}" viewBox="0 0 1100 490" role="img" aria-label="${esc(state.boss.name)} between ${esc(own.name)} and ${esc(other.name)}. Both communities are visible on this stream.">
-  <defs><pattern id="ruled" width="1100" height="33" patternUnits="userSpaceOnUse"><path d="M0 32.5H1100" stroke="#7da3ba" stroke-opacity=".17" stroke-width="1"/></pattern></defs>
-  <rect width="1100" height="490" fill="url(#ruled)"/><path d="M46 0V490" stroke="#df958d" stroke-opacity=".45"/>
-  <g fill="none" stroke="${ink}" stroke-width="2" opacity=".32"><path d="M80 61L87 77L105 72L94 88L105 103L85 96L73 109L76 88L61 79L80 79Z"/><path d="M1002 79q30 -20 20 12q-14 14 -8 24m-1 7v3"/><path d="M493 361q58 15 117 0M488 367q64 13 129 -1"/></g>
-  <text x="550" y="52" text-anchor="middle" class="svg-hand boss-label">${finishing ? 'THE COLLECTIVE FINISHER' : defeated ? 'THOROUGHLY OUT-DOODLED.' : state.round === 2 ? 'IT STOLE A STORM CLOUD?!' : 'THE INKLING'}</text>
-  <text x="550" y="76" text-anchor="middle" class="svg-meta" fill="${ink}" opacity=".6">${lobby ? 'ONE MONSTER. TWO COMMUNITIES. QUESTIONABLE IDEAS.' : state.phase === 'building' ? 'CHAT IS HOLDING THE PENCIL' : state.phase === 'generating' ? 'ASSEMBLING THE COLLECTIVE IMAGINATION…' : state.phase === 'reveal' ? 'PENCILS DOWN. BRACE YOURSELVES.' : 'LOOK WHAT YOU MADE.'}</text>
-  <g class="team-creature team-left" transform="translate(27 155) scale(.83)">${creationSVG(creature(own), own.color)}</g>
-  <g class="team-creature team-right" transform="translate(763 155) scale(.83)">${creationSVG(creature(other), other.color)}</g>
-  <g transform="translate(390 104)">${monsterSVG(state.round === 2, defeated)}</g>
-  ${impact ? `<g class="projectile projectile-left"><path d="M310 251q28 -31 56 0q-23 37 -56 0" fill="${own.color}" ${style}/><path d="M301 246l-18 -4m17 15l-24 5" ${style}/></g><g class="projectile projectile-right"><path d="M785 252q-29 -29 -53 0q23 35 53 0" fill="${other.color}" ${style}/><path d="M794 246l20 -5m-20 15l24 4" ${style}/></g><text x="550" y="385" text-anchor="middle" class="svg-hand impact-word">${defeated ? 'SPLAT!' : 'BONK!'}</text>` : ''}
-  ${finishing ? `<g class="finisher-move" aria-label="${esc(own.creation.name)} and ${esc(other.creation.name)} combine in one finishing move"><path class="finisher-beam-left" d="M305 300 Q420 185 550 253" fill="none" stroke="${own.color}" stroke-width="13" stroke-linecap="round"/><path class="finisher-beam-right" d="M798 300 Q684 185 550 253" fill="none" stroke="${other.color}" stroke-width="13" stroke-linecap="round"/><g class="finisher-star"><path d="M550 157L569 211L620 190L601 240L660 260L601 279L624 326L571 306L550 360L530 307L478 327L499 279L443 260L499 240L480 190L531 212Z" fill="#f9d45c" ${style}/></g><g transform="translate(440 188) scale(.32)">${creationSVG(own.creation,own.color)}</g><g transform="translate(531 190) scale(.32)">${creationSVG(other.creation,other.color)}</g><text x="550" y="378" text-anchor="middle" class="svg-hand boss-label">TOGETHER!</text><text x="190" y="140" text-anchor="middle" class="finisher-caption">${esc(own.creation.name.slice(0,43))}</text><text x="914" y="140" text-anchor="middle" class="finisher-caption">${esc(other.creation.name.slice(0,43))}</text></g>` : ''}
-  ${label(own,190,true)}${label(other,914,false)}
-  ${state.phase === 'finished' ? `<g transform="translate(550 426) rotate(-7)"><rect x="-157" y="-33" width="314" height="62" rx="3" fill="#f7f2e6" stroke="${state.winner === 'boss' || (state.winner !== perspective && state.winner !== 'tie') ? '#c45c49' : '#3b7362'}" stroke-width="4"/><text text-anchor="middle" y="8" class="svg-hand result-stamp" fill="${state.winner === 'boss' || (state.winner !== perspective && state.winner !== 'tie') ? '#c45c49' : '#3b7362'}">${state.winner === 'boss' ? 'THE MONSTER WINS' : state.winner === 'tie' ? 'SHARED VICTORY!' : state.winner === perspective ? 'YOUR CHAT WINS!' : 'SEE ME AFTER CLASS'}</text></g>` : ''}
-  </svg>`;
-}

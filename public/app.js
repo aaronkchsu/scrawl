@@ -46,20 +46,22 @@ function render(payload){
   $('access-form').hidden=authenticated;
   $('connection-notice').hidden=connected;
   renderLauncher(payload,enabled,actions);renderSetup(payload,enabled,actions);renderRehearsal(payload,enabled,actions);
-  route();renderBoard(s,payload.now);
+  route();renderBoard(s,payload.now,'a',true);
+  document.querySelector('.encounter-layout').classList.toggle('showing-fights',!['building','voting'].includes(s.phase)||s.experience!=='rehearsal');
   $('encounter-board').hidden=s.experience==='rehearsal'&&['building','voting'].includes(s.phase);
   if(previousPhase&&previousPhase!==s.phase)cue();previousPhase=s.phase;
-  const label=s.experience==='rehearsal'?'Rehearsal':s.experience==='demo'?'Scripted demo':'Live Twitch encounter';
+  const label=s.experience==='rehearsal'?'Try your ideas':s.experience==='demo'?'Demo':'Twitch game';
   $('session-title').textContent=label;
-  $('session-note').textContent=`${s.experience==='live'?'Real Twitch participants':'Simulated participants'} · ${s.mode==='ai'?'AI drawings · paid calls':'Sample artwork · free'}${s.experience==='rehearsal'?' · waits for you':''}`;
-  $('encounter-label').textContent=s.phase==='finished'?'ENCOUNTER COMPLETE':label.toUpperCase();
-  $('round-label').textContent=`ROUND ${s.round} / ${s.maxRounds}`;
+  $('session-note').textContent=`${s.experience==='rehearsal'?`Round ${s.round} of ${s.maxRounds} · `:''}${s.experience==='live'?'Live chat':'Simulated chat'} · ${s.mode==='ai'?'AI drawings · paid':'Sample drawings · free'}`;
+  $('encounter-label').textContent=s.phase==='finished'?'GAME OVER':label.toUpperCase();
+  $('round-label').textContent='';
   $('end-encounter').disabled=!enabled||s.phase==='lobby';
-  const step={building:0,voting:1,generating:2,reveal:3,resolving:4,finishing:4,finished:4}[s.phase]??0;
-  once('stepper',String(step),()=>{$('stepper').innerHTML=['Ideas','Vote','Draw','Inspect','Fight'].map((name,i)=>`<li ${i===step?'aria-current="step"':''} class="${i<step?'complete':''}"><span>${i<step?'✓':i+1}</span>${name}</li>`).join('');});
+  $('stepper').hidden=s.experience!=='rehearsal';
+  const step={building:0,voting:1,generating:2,reveal:2,resolving:3,finishing:3,finished:3}[s.phase]??0;
+  once('stepper',String(step),()=>{$('stepper').innerHTML=['Ideas','Pick','Draw','Fight'].map((name,i)=>`<li ${i===step?'aria-current="step"':''} class="${i<step?'complete':''}"><span>${i<step?'✓':i+1}</span>${name}</li>`).join('');});
   const detail=stepContent(payload);
   once('next',JSON.stringify([detail,enabled,s.phase]),()=>{
-    $('next-step').innerHTML=`<span class="eyebrow">${s.experience==='rehearsal'?'YOUR NEXT STEP':'ENCOUNTER CONTROLS'}</span><h2>${esc(detail.title)}</h2><p>${esc(detail.text)}</p><button id="step-action" class="button primary" ${!enabled||detail.disabled?'disabled':''}>${esc(detail.label)}</button><p class="step-note">${esc(detail.note||'')}</p>${s.phase==='finished'?'<button id="result-home" class="button secondary">Back to home</button>':''}`;
+    $('next-step').innerHTML=`<span class="eyebrow">${s.experience==='rehearsal'?'NEXT':'CONTROLS'}</span><h2>${esc(detail.title)}</h2><p>${esc(detail.text)}</p><button id="step-action" class="button primary" ${!enabled||detail.disabled?'disabled':''}>${esc(detail.label)}</button>${detail.note?`<p class="step-note">${esc(detail.note)}</p>`:''}${s.phase==='finished'?'<button id="result-home" class="button secondary">Home</button>':''}`;
     $('step-action').onclick=()=>{
       if(detail.action==='ideas')return submitIdeas(actions);
       if(detail.action==='again'){if(s.experience==='rehearsal')location.hash='rehearse';else if(s.experience==='demo')actions.start('demo');else location.hash='setup';return;}
@@ -73,7 +75,7 @@ function render(payload){
   once('credits',JSON.stringify([s.teams,s.experience]),()=>{$('communities').innerHTML=Object.values(s.teams).map(t=>`<article class="community-card" style="--team-color:${t.color}"><span class="team-caption">${esc(t.name)} · ${s.experience==='live'?'TWITCH':'SIMULATED'}</span><h3>${esc(t.creation.name)}</h3><p class="description">${esc(t.creation.description)}</p><div class="contribution-chips">${t.creation.contributions.map(c=>`<span class="contribution-chip"><strong>${esc(c.name)}</strong> ↳ ${esc(c.feature)}</span>`).join('')}</div>${t.result?`<p class="result-note">${esc(t.result)}</p>`:''}</article>`).join('');});
   const ai=payload.capabilities.ai;
   once('technical',JSON.stringify([ai,s.log,s.phase,enabled,s.experience]),()=>{
-    $('technical-content').innerHTML=`<div class="technical-grid"><section><h3>AI usage</h3><p>${ai.configured?esc(ai.model):'AI not configured'} · ${ai.requests} / ${ai.maxRequests} calls used</p><p>${ai.inputTokens.toLocaleString()} input tokens · ${ai.outputTokens.toLocaleString()} output tokens</p><p>${ai.unreportedRequests?`${ai.unreportedRequests} earlier attempts have no returned usage and may still have charges.`:'All attempts have reported usage.'}</p><a href="https://platform.openai.com/usage" target="_blank" rel="noreferrer">Check billed usage ↗</a><p class="muted">This is a request cap, not a dollar budget. Keys and credentials stay on the server.</p></section><section><h3>Encounter log</h3>${s.log.slice(-6).map(row=>`<p>${esc(row.text)}</p>`).join('')||'<p>No encounter started.</p>'}${s.experience==='live'?`<button id="host-lock" class="button secondary" ${!enabled||!['building','voting'].includes(s.phase)||s.paused?'disabled':''}>${s.phase==='voting'?'Close vote & draw':'Open vote now'}</button>`:''}</section></div>`;
+    $('technical-content').innerHTML=`<div class="technical-grid"><section><h3>AI usage</h3><p>${ai.configured?esc(ai.model):'AI not configured. Add OPENAI_API_KEY to this project’s .env and restart the server.'} · ${ai.requests} / ${ai.maxRequests} calls used</p><p>${ai.inputTokens.toLocaleString()} input tokens · ${ai.outputTokens.toLocaleString()} output tokens</p><p>${ai.unreportedRequests?`${ai.unreportedRequests} earlier attempts have no returned usage and may still have charges.`:'All attempts have reported usage.'}</p><a href="https://platform.openai.com/usage" target="_blank" rel="noreferrer">Check billed usage ↗</a><p class="muted">This is a request cap, not a dollar budget. Keys and credentials stay on the server.</p></section><section><h3>Game log</h3>${s.log.slice(-6).map(row=>`<p>${esc(row.text)}</p>`).join('')||'<p>No game started.</p>'}${s.experience==='live'?`<button id="host-lock" class="button secondary" ${!enabled||!['building','voting'].includes(s.phase)||s.paused?'disabled':''}>${s.phase==='voting'?'Close vote & draw':'Open vote now'}</button>`:''}</section></div>`;
     if($('host-lock'))$('host-lock').onclick=()=>actions.control('lock');
   });
 }
@@ -88,12 +90,12 @@ async function init(){
     if(!authenticated){try{await post('/api/session',{});authenticated=true;}catch{}}
     connected=true;render(initial);
     if(!location.hash&&initial.state.phase!=='lobby')location.hash='encounter';
-    if(new URLSearchParams(location.search).has('connected')){history.replaceState({},'',location.pathname+'#setup');route();toast('Channel connected. Continue the Twitch checklist.');}
+    if(new URLSearchParams(location.search).has('connected')){history.replaceState({},'',location.pathname+'#setup');route();toast('Channel connected.');}
     const stream=new EventSource('/api/events');
     stream.onopen=()=>{connected=true;$('connection').classList.remove('offline');$('connection').innerHTML='<i></i>Server connected';if(current)render(current);};
     stream.onerror=()=>{connected=false;$('connection').classList.add('offline');$('connection').innerHTML='<i></i>Reconnecting';if(current)render(current);};
     stream.onmessage=event=>render(JSON.parse(event.data));
   }catch(e){error(`${e.message} Start the local server with npm start, then reload this page.`);$('watch-demo').disabled=true;}
 }
-setInterval(()=>{if(current)renderBoard(current.state,Date.now()+offset);},200);
+setInterval(()=>{if(current)renderBoard(current.state,Date.now()+offset,'a',true);},200);
 void init();
