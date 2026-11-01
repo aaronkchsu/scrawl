@@ -2,7 +2,7 @@
 
 Use the private `aaronkchsu/scrawl` repository and its `render.yaml` as a Render Blueprint. It defines one 0.5 CPU / 512 MB Node container in Oregon and one 256 MB managed Postgres database with 5 GB storage in the same region. Database public access and storage autoscaling are disabled. Render confirmed a base total of $14.50/month on November 1, 2026: $7 web compute, $6 database compute, and $1.50 storage. Taxes and usage overages are additional; this is not a billing cap.
 
-The first deployment is live at **https://scrawl-zcc6.onrender.com**. `/health` returns 200 and practice works. Twitch registration/authorization remains unfinished, so this is a hosted preview rather than a completed Twitch launch. The production callback is `https://scrawl-zcc6.onrender.com/auth/twitch/callback`.
+The pilot is live at **https://scrawl-zcc6.onrender.com**. Twitch sign-in, real chat commands, OBS rendering and saved loot have been verified with AaronKc. Chat, Hype and gift subscriptions report connected; actual Hype/gift delivery and two-channel live rescues remain unverified. The production callback is `https://scrawl-zcc6.onrender.com/auth/twitch/callback`.
 
 ## First deployment
 
@@ -28,6 +28,8 @@ Set `HOSTING_MONTHLY_ESTIMATE_USD` after verifying the actual web+database+stora
 ## Persistence and recovery
 
 One coordinator owns a ten-second database lease. A deployment requests handoff; the old process stops consuming events before the replacement acquires the lease. A failed save pauses play and fails `/health`; Render restarts an unhealthy running instance after sustained failures. Overlays reconnect to full snapshots. This may briefly interrupt the stream overlay during deployment; it is not a multi-server availability guarantee.
+
+Database statements and client queries have three-second timeouts. If the game loop makes no progress for ten seconds, the server pauses controls and fails health checks even when a save is still waiting. A late completion cannot re-enable that coordinator. Ordinary conversation bypasses game transactions; only supported game commands enter the save queue. Snapshot reads copy only the requested camp, and windows for the same audience share each update frame.
 
 Postgres holds encrypted Twitch credentials, hashed web sessions/invites, room membership, settings, caves, queues, runs, viewer progress, deduplication IDs and the AI ledger. The lease/metadata row and changed room/profile rows commit in the same transaction, so loot and the triggering event are saved together. Idle ticks update the small lease row without rewriting inventories. Active run deadlines shift by downtime on restart; expired Hype Trains do not continue indefinitely. Incomplete AI jobs offer retry with their original ideas.
 

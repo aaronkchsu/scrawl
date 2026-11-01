@@ -6,6 +6,7 @@ import type { ChatMessage, Team, TeamId } from './types.ts';
 import { routeOutlook } from './expedition-risk.ts';
 import { ROCK_RULES, type GiftEvent, type GiftRock } from './expedition-events.ts';
 import { RescueLine, RESCUE_RULES, otherCamp, type Rescue, type RescuePerson } from './expedition-rescue.ts';
+export const isExpeditionCommand = (text: string) => /^!(join|dig|keep|risk|equip|idea)(?:\s|$)/i.test(text.trim());
 type Player = Profile & {
     team: TeamId;
     lastSeen: number;
@@ -559,7 +560,7 @@ export class Expedition {
         this.changed();
     }
     ingest(message: Omit<ChatMessage, 'at'>) {
-        if (this.mode !== 'live' || message.source !== 'twitch' || this.channels[message.team].status !== 'connected' || this.seen.has(message.id))
+        if (!isExpeditionCommand(message.text) || this.mode !== 'live' || message.source !== 'twitch' || this.channels[message.team].status !== 'connected' || this.seen.has(message.id))
             return;
         this.seen.add(message.id);
         if (this.seen.size > 5000)

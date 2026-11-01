@@ -1,12 +1,12 @@
 import { randomUUID } from 'node:crypto';
-import { Expedition } from './expedition.ts';
+import { Expedition, isExpeditionCommand } from './expedition.ts';
 import { ProfileStore } from './expedition-store.ts';
 import { DEFAULT_SETTINGS, validateSettings } from './expedition-catalog.ts';
 import { CaveWorkshop, type Cave, type CaveBatch } from './expedition-caves.ts';
 import { opaque, digest, TokenVault } from './hosted-auth.ts';
 import type { Account, HostedData, HostedRoom, HostedStorage, Checkpoint } from './hosted-store.ts';
 import type { Credentials } from './twitch.ts';
-import type { TeamId } from './types.ts';
+import type { ChatMessage, TeamId } from './types.ts';
 
 export class HostedGame {
     onChange = () => {};
@@ -18,7 +18,7 @@ export class HostedGame {
         this.storage = storage; this.vault = vault; this.maxRooms = maxRooms; this.now = now;
     }
     async change<T>(fn: (d: HostedData) => T | Promise<T>) { const result = await this.storage.transaction(fn); this.onChange(); return result; }
-    hydrate(d: HostedData, room: HostedRoom) {
+    hydrate(d: Pick<HostedData, 'profiles' | 'accounts'>, room: HostedRoom) {
         const store = new ProfileStore(); store.profiles = d.profiles;
         const game = new Expedition({ store, seedDemo: false, now: this.now }); game.restore(room.game);
         room.members.forEach((id, i) => { game.campSettings[i ? 'b' : 'a'] = d.accounts[id]!.settings; });
@@ -77,6 +77,11 @@ export class HostedGame {
             const game = this.hydrate(d, room); fn(game, team); room.game = game.checkpoint();
             if (key) d.deliveries[key] = this.now();
         });
+    }
+    async ingest(id: string, message: Omit<ChatMessage, 'at'>) {
+        // Ordinary conversation never enters the database queue or delivery ledger.
+        if (message.source !== 'twitch' || !isExpeditionCommand(message.text)) return;
+        await this.channel(id, (game, team) => game.ingest({ ...message, team }), message.id, true);
     }
     async tick() {
         await this.change(d => {
@@ -194,7 +199,13 @@ export class HostedGame {
         });
     }
     payload(id: string, overlay = false) {
-        const d = this.storage.read(), { account, room, team } = this.roomFor(d, id), state = this.hydrate(d, room).snapshot();
+        const d = this.storage.read(data => {
+            const selected = this.roomFor(data, id);
+            return { ...selected,
+                accounts: Object.fromEntries(selected.room.members.map(member => [member, data.accounts[member]!])),
+                profiles: Object.fromEntries(selected.room.game.players.flatMap(([player]) => data.profiles[player] ? [[player, data.profiles[player]!]] : [])) };
+        });
+        const { account, room, team } = d, state = this.hydrate(d, room).snapshot();
         state.settings = { ...account.settings, slots: room.game.settings.slots, roomSeconds: room.game.settings.roomSeconds };
         if (overlay) {
             state.caves.pools = { a: [], b: [] }; state.caves.job = null; state.saveError = null;
