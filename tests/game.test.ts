@@ -14,6 +14,17 @@ test('offline drawings preserve several recognizable authors',()=>{
  const result=demoCreation([message('alice','a duck'),message('bob','give it a sponge'),message('cara','add wheels')]);
  assert.equal(result.body,'duck');assert.deepEqual(result.features,['sponge','wheels']);assert.equal(new Set(result.contributions.map(c=>c.name)).size,3);
 });
+test('sample description follows the voted body and includes its attack equipment',async()=>{
+ const game=new Game({random:()=>0.999});game.start();
+ game.ingest(idea('alice','duck with wheels','a','soak'));
+ game.ingest(idea('bob','another duck with wheels','a','soak'));
+ game.ingest(idea('cara','frog','a','catch'));
+ game.openVote();game.ingest(idea('voter','!vote 3'));await game.lock();
+ const creation=game.state.teams.a.creation;
+ assert.equal(creation.body,'frog');assert.deepEqual(creation.features,['bucket','wheels']);
+ assert.equal(creation.description,'Frog + bucket + wheels.');assert.equal(creation.contributions.length,3);
+ game.close();
+});
 test('the AI context adapter bounds each author',()=>{
  const messages=[message('a','duck'),message('b','duck'),message('c','duck'),...Array.from({length:100},(_,i)=>message('spammer',`robot ${i}`))];
  assert.equal(balanceMessages(messages).filter(m=>m.userId==='spammer').length,2);
@@ -73,7 +84,7 @@ test('a late AI completion cannot overwrite a reset encounter',async()=>{
 });
 test('generation failure preserves selected text for BOTH teams without applying damage',async()=>{
  const game=new Game({creator:async()=>{throw new Error('Simulated timeout');}});game.start('ai');game.ingest(idea('a','duck'));game.ingest(idea('b','robot','b','catch'));
- await draw(game);assert.equal(game.state.paused,true);assert.match(game.state.error!,/timeout/);assert.equal(game.state.boss.health,130);
+ await draw(game);assert.equal(game.state.paused,true);assert.match(game.state.error!,/timeout/);assert.deepEqual(Object.values(game.state.teams).map(t=>t.boss.health),[70,70]);
  assert.ok(game.state.teams.a.selectedId);assert.ok(game.state.teams.b.selectedId);assert.equal(game.state.teams.a.score,0);game.close();
 });
 test('a retry preserves the winning recipe instead of rerolling the election',async()=>{
@@ -97,20 +108,22 @@ test('brace defense uses nominee participation, not raw extra messages or accoun
  let now=1000;const game=new Game({now:()=>now});game.start();for(let i=0;i<3;i++)game.ingest(idea(`a-${i}`,`duck ${i}`));
  for(let i=0;i<300;i++)assert.equal(game.ingest(idea(`outsider-${i}`,'!brace')).accepted,false);await draw(game);now+=6001;game.tick();assert.equal(game.state.teams.a.health,76);game.close();
 });
-test('complementary counters create a shared effect and both inventions form the final victory',async()=>{
+test('two independently defeated bosses draw without extra generation for the result',async()=>{
  let now=1000;let calls=0;const game=new Game({now:()=>now,creator:async input=>{calls++;return demoCreation(input.messages);}});game.start('ai');
  for(let round=0;round<2;round++){
   for(const row of fixtureRounds[round])game.ingest(idea(row.name,row.text,row.team,row.approach));
-  await draw(game);now+=6001;game.tick();assert.match(game.state.teams.a.result,/community combo/);now+=8001;game.tick();
+  game.openVote();
+  for(const team of ['a','b'] as const) game.ingest(idea(`voter-${team}`,`!vote ${game.state.teams[team].finalists.find(f=>f.approach.impact===35)!.id}`,team));
+  await game.lock();now+=6001;game.tick();assert.equal(game.state.teams.a.lastDamage,35);now+=8001;game.tick();
  }
- assert.equal(game.state.phase,'finishing');assert.equal(game.state.boss.health,0);assert.equal(game.state.finisher!.components.length,2);assert.equal(calls,4);
- now+=5001;game.tick();assert.equal(game.state.phase,'finished');assert.equal(game.state.winner,'tie');assert.equal(calls,4);
- const snapshot=game.snapshot();snapshot.teams.a.score=999;assert.notEqual(game.state.teams.a.score,999);game.close();
+ assert.equal(game.state.phase,'finishing');assert.deepEqual(Object.values(game.state.teams).map(t=>t.boss.health),[0,0]);assert.equal(calls,4);
+ now+=5001;game.tick();assert.equal(game.state.phase,'finished');assert.equal(game.state.winner,'tie');assert.equal(game.state.resultReason,'same-round');assert.equal(calls,4);
+ const snapshot=game.snapshot();snapshot.teams.a.boss.health=999;assert.equal(game.state.teams.a.boss.health,0);game.close();
 });
-test('the synthetic demo automatically nominates, votes and reaches a shared victory',async()=>{
+test('the free scripted demo completes with a competitive winner',async()=>{
  let now=1000;const game=new Game({now:()=>now});game.start('demo',true);
  for(let i=0;i<400&&game.state.phase!=='finished';i++){now+=250;game.tick();await new Promise<void>(resolve=>setImmediate(resolve));}
- assert.equal(game.state.phase,'finished');assert.equal(game.state.winner,'tie');assert.ok(game.state.finisher);game.close();
+ assert.equal(game.state.phase,'finished');assert.equal(game.state.winner,'a');assert.equal(game.state.resultReason,'boss-defeated');assert.equal(game.state.teams.b.boss.health,17);game.close();
 });
 test('the second round clears votes and nominations and presents new public counters',async()=>{
  let now=1000;const game=new Game({now:()=>now});game.start();game.ingest(idea('alice','duck'));await draw(game);now+=6001;game.tick();now+=8001;game.tick();

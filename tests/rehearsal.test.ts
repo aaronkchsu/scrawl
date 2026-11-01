@@ -15,14 +15,14 @@ test('rehearsal holds editing, voting and reveal, then combat advances to a held
   now+=100_000;game.tick();assert.equal(game.state.phase,'building');assert.equal(calls,0);
   assert.throws(()=>game.pause(),/waits for you/);
   submit(game);now+=100_000;game.tick();assert.equal(game.state.phase,'voting');assert.equal(calls,0);
-  game.voteRehearsal('a','1');game.voteRehearsal('b','1');await game.lock();
+  game.voteRehearsal('a','1');game.voteRehearsal('b',game.state.teams.b.finalists.find(f=>f.approach.impact===35)!.id);await game.lock();
   assert.equal(calls,2);assert.equal(game.state.phase,'reveal');
-  now+=100_000;game.tick();assert.equal(game.state.phase,'reveal');assert.equal(game.state.boss.health,130);
+  now+=100_000;game.tick();assert.equal(game.state.phase,'reveal');assert.deepEqual(Object.values(game.state.teams).map(t=>t.boss.health),[70,70]);
   assert.equal(game.state.teams.a.creation.contributions.length,3);
   game.playRehearsalFight();assert.equal(game.state.phase,'resolving');
   now+=8001;game.tick();assert.equal(game.state.phase,'building');assert.equal(game.state.round,2);
   now+=100_000;game.tick();assert.equal(game.state.phase,'building');assert.equal(game.state.teams.a.voterCount,0);
-  submit(game);game.voteRehearsal('a','1');game.voteRehearsal('b','1');await game.lock();game.playRehearsalFight();
+  submit(game);game.voteRehearsal('a','1');game.voteRehearsal('b',game.state.teams.b.finalists.find(f=>f.approach.impact===35)!.id);await game.lock();game.playRehearsalFight();
   now+=8001;game.tick();assert.equal(game.state.phase,'finishing');now+=5001;game.tick();
   assert.equal(game.state.phase,'finished');assert.equal(game.state.winner,'tie');assert.equal(calls,4);game.close();
 });
@@ -49,7 +49,7 @@ test('the whole rehearsal form is validated before any ideas are admitted',()=>{
 test('failed rehearsal generation holds recipes; retry and reset cannot silently change the result',async()=>{
   let fail=true;
   const game=new Game({creator:async input=>{if(fail)throw new Error('Try again');return demoCreation(input.messages);}});
-  game.start('ai',false,'rehearsal');submit(game);game.voteRehearsal('a','2');game.voteRehearsal('b','1');await game.lock();
+  game.start('ai',false,'rehearsal');submit(game);game.voteRehearsal('a','2');game.voteRehearsal('b',game.state.teams.b.finalists.find(f=>f.approach.impact===35)!.id);await game.lock();
   assert.equal(game.state.phase,'generating');assert.ok(game.state.error);const chosen=game.state.teams.a.selectedId;
   fail=false;await game.lock();assert.equal(game.state.phase,'reveal');assert.equal(game.state.deadline,null);assert.equal(game.state.teams.a.selectedId,chosen);game.close();
   let release:()=>void=()=>{};const waiting=new Promise<void>(resolve=>release=resolve);
