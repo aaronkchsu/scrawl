@@ -8,7 +8,7 @@ export async function request(path, body) {
 export function connectState(onState, onConnection) {
     let source, disposed = false;
     const params = new URLSearchParams(location.search);
-    const suffix = location.pathname === '/overlay' ? '?' + new URLSearchParams([...params].filter(([k]) => ['channel', 'practice'].includes(k))).toString() : ''; 
+    const suffix = location.pathname === '/overlay' ? '?' + new URLSearchParams([...params].filter(([k]) => ['channel', 'practice'].includes(k))).toString() : '';
     fetch('/api/state' + suffix).then(r => { if (!r.ok)
         throw new Error(); return r.json(); }).then(onState).catch(() => onConnection(false));
     source = new EventSource('/api/events' + suffix);
