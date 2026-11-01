@@ -1,11 +1,13 @@
 # Hosted pilot
 
-Use the private `aaronkchsu/scrawl` repository and its `render.yaml` as a Render Blueprint. It defines one 0.5 CPU / 512 MB Node container in Oregon and one 256 MB managed Postgres database with 5 GB storage in the same region. Database public access and storage autoscaling are disabled. Confirm the current price in Render before creating resources. The web compute price observed on November 1 was $7/month; database/storage charges are additional.
+Use the private `aaronkchsu/scrawl` repository and its `render.yaml` as a Render Blueprint. It defines one 0.5 CPU / 512 MB Node container in Oregon and one 256 MB managed Postgres database with 5 GB storage in the same region. Database public access and storage autoscaling are disabled. Render confirmed a base total of $14.50/month on November 1, 2026: $7 web compute, $6 database compute, and $1.50 storage. Taxes and usage overages are additional; this is not a billing cap.
+
+The first deployment is live at **https://scrawl-zcc6.onrender.com**. `/health` returns 200 and practice works. Twitch registration/authorization remains unfinished, so this is a hosted preview rather than a completed Twitch launch. The production callback is `https://scrawl-zcc6.onrender.com/auth/twitch/callback`.
 
 ## First deployment
 
 1. Connect Render to the private repository, then create a Blueprint from `main`.
-2. Supply this game's `TWITCH_CLIENT_ID` and `TWITCH_CLIENT_SECRET` in Render's secret fields. Do not copy the captions app's credentials. Leave paid AI unconfigured initially.
+2. Leave the Twitch fields blank if the app has not been registered yet; Render can create the service and its URL first. Then supply this game's `TWITCH_CLIENT_ID` and `TWITCH_CLIENT_SECRET` in Render's secret fields and redeploy. Do not copy the captions app's credentials. Leave paid AI unconfigured initially.
 3. Keep the generated `TOKEN_ENCRYPTION_KEY` stable. Store a secure backup outside Git. Changing it makes stored Twitch tokens unreadable; users would have to reconnect.
 4. The service uses Render's `RENDER_EXTERNAL_URL`. Register the exact `https://<service>.onrender.com/auth/twitch/callback` in the Twitch application. No localhost callback in production.
 5. Open the hosted URL, sign in, copy the channel-specific OBS URL and open camp. A second broadcaster signs in independently and accepts a one-use invite.
@@ -13,7 +15,7 @@ Use the private `aaronkchsu/scrawl` repository and its `render.yaml` as a Render
 
 The app can serve practice before Twitch credentials are configured. That is a preview, not a completed Twitch launch. `DATABASE_URL` selects hosted mode; without it the legacy local single-host server runs. Never deploy the legacy mode as public signup.
 
-Every Render build runs TypeScript checks and the mocked test suite in a separate Docker stage before creating the production image. The final image contains production dependencies only. Deployments follow commits and fail if those checks fail; they do not depend on GitHub Actions availability. GitHub's account billing lock currently prevents its additional Actions workflow from running. The Docker build itself still needs verification on Render because Docker is unavailable locally.
+Every Render build runs TypeScript checks and the mocked test suite in a separate Docker stage before creating the production image. The first Render build passed all 98 tests and deployed successfully from GitHub commit `4299ceb`. The final image contains production dependencies only. Deployments follow commits and fail if those checks fail; they do not depend on GitHub Actions availability. GitHub's account billing lock currently prevents its additional Actions workflow from running.
 
 ## AI and costs
 

@@ -30,12 +30,13 @@ The excavation game replaces the boss race as SCRAWL's active experience. It is 
 - Startup/hourly token validation, refresh/reconnect/re-subscribe, visible chat/Hype/gift availability.
 - Free per-session practice; built-in caves for all; operator-controlled explicit AI requests with the prior 13/14 ledger preserved.
 - Render Docker + Postgres Blueprint and Node 24 CI.
+- Hosted practice at https://scrawl-zcc6.onrender.com, backed by managed Postgres. Render's Docker build passed all 98 tests; health and hosted practice passed smoke checks. Twitch signup is not enabled yet.
 
 ## Needed before a live release
 
 - Connect a real broadcaster and verify OAuth, chat, Hype Train and gift-sub access, and reconnect behavior. Automated tests use mocks.
 - Test in OBS and a second streamer's browser source. Browser rendering and transparency are checked, but OBS itself has not been exercised.
-- Deploy the prepared Render Blueprint with managed Postgres; finish Twitch application registration and the hosted smoke test.
+- Finish Twitch application registration and credentials, then verify hosted OAuth and live events.
 - Local automated checks cover 10 rooms with 100 viewers each. Check actual hosted latency and tune queue wait times; currently 32 resting avatars are rendered.
 - Capture a real-stream promotional demo; label any simulated events in the recording.
 
