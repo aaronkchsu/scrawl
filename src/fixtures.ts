@@ -5,7 +5,7 @@ export const fixtureRounds: { team: TeamId; name: string; text: string; approach
     { team: 'a', name: 'mossboss', text: 'a duck with a sponge beak', approach: 'soak' },
     { team: 'b', name: 'toastghost', text: 'a robot carrying a giant jam jar', approach: 'catch' },
     { team: 'a', name: 'tinywizard', text: 'a frog wearing an enormous sponge backpack', approach: 'soak' },
-    { team: 'b', name: 'pixelpigeon', text: 'a cat using a bucket as a helmet', approach: 'catch' },
+    { team: 'b', name: 'pixelpigeon', text: 'a cat hiding under a bucket and an umbrella', approach: 'shield' },
     { team: 'a', name: 'noodleclub', text: 'a duck on roller skates dragging a sponge', approach: 'soak' },
     { team: 'b', name: 'orbitalbread', text: 'a robot pushing a bucket on wheels', approach: 'catch' },
   ],

@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { demoCreation, emptyCreation } from './collective.ts';
+import { demoCreation, describeDemoCreation, emptyCreation } from './collective.ts';
+import { BOSS_HEALTH, raceOutcome } from './race.ts';
 import { fixtureRounds } from './fixtures.ts';
 import { SAMPLE_SIZE, approachesFor, finalistsFrom, winningFinalist } from './selection.ts';
 import { TEAM_IDS } from './types.ts';
@@ -27,8 +28,8 @@ export class Game {
     this.state = this.initial();
   }
   private initial(): MatchState {
-    const team = (id: TeamId, name: string, color: string): Team => ({ id, name, color, health: 100, score: 0, messages: [], nominationCount: 0, finalists: [], selectedId: null, voterCount: 0, creation: emptyCreation(), braces: [], result: '', lastDamage: 0, channel: null, connection: 'offline', connectionNote: 'Connect a Twitch channel when you’re ready.' });
-    return { id: randomUUID(), revision: 0, mode: 'demo', experience: 'demo', phase: 'lobby', round: 0, maxRounds: 2, approaches: approachesFor(1), finisher: null, deadline: null, remainingMs: 0, paused: false, error: null, winner: null, boss: { name: 'The Inkling', health: 130, maxHealth: 130, cue: 'An ink spill with a very bad attitude.', weakness: 'absorb' }, teams: { a: team('a', 'The Doodle Ducks', '#ee7544'), b: team('b', 'The Scribble Society', '#4668d9') }, log: [], startedAt: null, autoDemo: false };
+    const team = (id: TeamId, name: string, color: string): Team => ({ boss: { name: 'The Inkling', health: BOSS_HEALTH, maxHealth: BOSS_HEALTH, cue: 'Stop the ink attack.', weakness: 'absorb' }, id, name, color, health: 100, score: 0, messages: [], nominationCount: 0, finalists: [], selectedId: null, voterCount: 0, creation: emptyCreation(), braces: [], result: '', lastDamage: 0, channel: null, connection: 'offline', connectionNote: 'Connect a Twitch channel when you’re ready.' });
+    return { id: randomUUID(), revision: 0, mode: 'demo', experience: 'demo', phase: 'lobby', round: 0, maxRounds: 2, approaches: approachesFor(1), resultReason: null, deadline: null, remainingMs: 0, paused: false, error: null, winner: null, teams: { a: team('a', 'Orange team', '#ee7544'), b: team('b', 'Blue team', '#4668d9') }, log: [], startedAt: null, autoDemo: false };
   }
   snapshot(): MatchState { return structuredClone(this.state); }
   private change() { this.state.revision++; this.onChange(); }
@@ -49,13 +50,16 @@ export class Game {
   private beginRound() {
     this.state.paused = false; this.state.error = null; this.clearRound(); this.fixtureIndex = 0; this.fixtureAt = this.clock() + 500;
     for (const team of Object.values(this.state.teams)) { team.messages = []; team.nominationCount = 0; team.finalists = []; team.selectedId = null; team.voterCount = 0; team.braces = []; team.result = ''; team.lastDamage = 0; }
-    const storm = this.state.round === 2; this.state.approaches = approachesFor(this.state.round); this.state.boss.weakness = storm ? 'ground' : 'absorb';
-    this.state.boss.cue = storm ? 'A stolen storm cloud. Ground, reflect, or shelter.' : 'An ink spill. Soak, catch, or shelter.';
-    this.log(storm ? 'The Inkling stole a storm cloud. Adapt your inventions!' : 'One monster. Two communities. Each gets one invention per round.');
+    const storm = this.state.round === 2; this.state.approaches = approachesFor(this.state.round);
+    for (const team of Object.values(this.state.teams)) {
+      team.boss.weakness = storm ? 'ground' : 'absorb';
+      team.boss.cue = storm ? 'Stop the lightning attack.' : 'Stop the ink attack.';
+    }
+    this.log(storm ? 'Both bosses use lightning this round.' : 'Each team fights its own boss. Both start at 70 health.');
     this.setPhase('building', this.state.autoDemo ? 11_000 : durations.building); this.change();
   }
   setConnection(id: TeamId, channel: string | null, status: Team['connection'], note: string) { Object.assign(this.state.teams[id], { channel, connection: status, connectionNote: note }); if (channel) this.state.teams[id].name = channel; this.change(); }
-  rename(id: TeamId, name: string) { if (this.state.phase !== 'lobby' && this.state.phase !== 'finished') throw new Error('Team names can be changed between encounters.'); this.state.teams[id].name = name.slice(0, 36).trim() || (id === 'a' ? 'The Doodle Ducks' : 'The Scribble Society'); this.change(); }
+  rename(id: TeamId, name: string) { if (this.state.phase !== 'lobby' && this.state.phase !== 'finished') throw new Error('Team names can be changed between encounters.'); this.state.teams[id].name = name.slice(0, 36).trim() || (id === 'a' ? 'Orange team' : 'Blue team'); this.change(); }
   ingest(input: Omit<ChatMessage, 'at'>): { accepted: boolean; reason?: string } {
     if ((this.state.experience === 'rehearsal' && input.source !== 'rehearsal') || (this.state.experience === 'demo' && input.source !== 'demo') || (this.state.experience === 'live' && ['demo', 'rehearsal'].includes(input.source))) return { accepted: false, reason: 'This input belongs to a different experience.' };
     if (this.state.paused || !['building', 'voting', 'generating', 'reveal'].includes(this.state.phase)) return { accepted: false, reason: 'The invention window is closed.' };
@@ -113,14 +117,16 @@ export class Game {
     try {
       const creations = await Promise.all(TEAM_IDS.map(async id => {
         const team = this.state.teams[id]; const lead = team.finalists.find(f => f.id === team.selectedId);
-        if (!lead) return { ...emptyCreation(), name: 'A blank page', description: 'No nomination this round. The monster is unimpressed.' };
+        if (!lead) return { ...emptyCreation(), name: 'No fighter', description: 'No ideas this round.' };
         const messages = [lead.message, ...team.finalists.filter(f => f.id !== lead.id).map(f => f.message)];
-        if (this.state.mode === 'ai') return this.creator({ team: id, messages: structuredClone(messages), previous: structuredClone(team.creation), weakness: this.state.boss.weakness, selection: { messageId: lead.message.id, approach: structuredClone(lead.approach) }, signal: controller.signal });
-        const creation = demoCreation(messages, team.creation); creation.body = demoCreation([lead.message], team.creation).body; creation.name = demoCreation([lead.message], team.creation).name; creation.capabilities = [lead.approach.capability];
+        if (this.state.mode === 'ai') return this.creator({ team: id, messages: structuredClone(messages), previous: structuredClone(team.creation), weakness: team.boss.weakness, selection: { messageId: lead.message.id, approach: structuredClone(lead.approach) }, signal: controller.signal });
+        const creation = demoCreation(messages, team.creation), leadCreation = demoCreation([lead.message], team.creation);
+        creation.body = leadCreation.body; creation.name = leadCreation.name; creation.capabilities = [lead.approach.capability];
         if (!creation.features.includes(lead.approach.tool)) creation.features = [lead.approach.tool, ...creation.features].slice(0, 4);
+        creation.description = describeDemoCreation(creation.body, creation.features);
         creation.contributions = messages.map(m => {
           const details = demoCreation([m]).features.filter(f => creation.features.includes(f));
-          return { messageId: m.id, name: m.name, feature: m.id === lead.message.id ? `Lead: ${creation.body} · ${lead.approach.label}` : details.length ? `Visual detail: ${details.join(' + ')}` : 'Finalist inspiration · limited demo vocabulary' };
+          return { messageId: m.id, name: m.name, feature: m.id === lead.message.id ? `${creation.body} · ${lead.approach.label}` : details.length ? details.join(' + ') : 'Idea included; no matching sample shape' };
         });
         return creation;
       }));
@@ -158,40 +164,38 @@ export class Game {
     this.fixtureAt = this.clock() + 500; this.change();
   }
   private resolve() {
-    const selected = TEAM_IDS.map(id => this.state.teams[id].finalists.find(f => f.id === this.state.teams[id].selectedId)?.approach);
-    const comboPair = this.state.round === 1 ? ['absorb', 'contain'] : ['ground', 'reflect'];
-    const combo = comboPair.every(cap => selected.some(a => a?.capability === cap)); let total = 0;
-    for (const [index, id] of TEAM_IDS.entries()) {
-      const team = this.state.teams[id]; const approach = selected[index]; const damage = approach ? approach.impact + (combo ? 6 : 0) : 0;
-      // Only actual nominees can contribute to the brace ratio. Extra non-nominee accounts cannot inflate it.
+    // Apply both attacks before checking the result; team order and AI latency never decide a race.
+    for (const id of TEAM_IDS) {
+      const team = this.state.teams[id];
+      const approach = team.finalists.find(f => f.id === team.selectedId)?.approach;
+      const damage = Math.min(team.boss.health, approach?.impact ?? 0);
       const braced = team.braces.filter(user => this.nominations[id].has(user)).length;
       const braceRatio = team.nominationCount ? braced / team.nominationCount : 0;
       const incoming = Math.max(0, 24 - (approach?.defense ?? 0) - Math.round(braceRatio * 12));
-      team.health = Math.max(0, team.health - incoming); team.score += damage; team.lastDamage = damage; total += damage;
-      team.result = approach ? `${approach.label}: ${damage} impact${combo ? ' (+6 community combo)' : ''} · ${incoming} damage taken. Votes choose the idea; they never multiply power.` : 'No nomination. The blank page takes the hit.';
+      team.health = Math.max(0, team.health - incoming);
+      team.boss.health -= damage;
+      team.score += damage;
+      team.lastDamage = damage;
+      team.result = approach ? `${approach.label}: ${damage} boss damage · ${team.boss.health} boss health left.` : 'No idea this round. No damage dealt.';
     }
-    this.state.boss.health = Math.max(0, this.state.boss.health - total);
-    if (combo) this.log(this.state.round === 1 ? 'Community combo! One invention soaks while the other catches. +6 impact each.' : 'Community combo! One invention reflects into the other’s grounding path. +6 impact each.');
-    this.log(`${total} combined impact. ${this.state.boss.health ? 'The Inkling is reconsidering its choices.' : 'Both communities out-doodled the monster!'}`);
+    this.log(TEAM_IDS.map(id => `${this.state.teams[id].name}: boss ${this.state.teams[id].boss.health}/${BOSS_HEALTH}`).join(' · '));
     this.setPhase('resolving', durations.resolving); this.change();
   }
   private endRound() {
-    if (this.state.boss.health === 0) {
-      const components = TEAM_IDS.flatMap(id => { const team = this.state.teams[id]; const selected = team.finalists.find(f => f.id === team.selectedId); return selected ? [{ team: id, name: team.creation.name, lead: selected.message.text }] : []; });
-      if (components.length === 2) { this.state.finisher = { name: 'THE COLLECTIVE FINISHER', components }; this.log('Two inventions. One finishing move. Both communities own this victory.'); this.setPhase('finishing', durations.finishing); this.change(); }
-      else this.finish();
-    } else if (this.state.round >= this.state.maxRounds) this.finish();
-    else { this.state.round++; this.beginRound(); }
+    const outcome = raceOutcome(this.state.teams, this.state.round, this.state.maxRounds);
+    if (outcome) {
+      this.state.winner = outcome.winner;
+      this.state.resultReason = outcome.reason;
+      this.log(outcome.winner === 'tie' ? 'Draw.' : `${this.state.teams[outcome.winner].name} wins.`);
+      this.setPhase('finishing', durations.finishing); this.change();
+    } else { this.state.round++; this.beginRound(); }
   }
-  private finish() {
-    this.state.winner = this.state.boss.health > 0 ? 'boss' : 'tie';
-    this.log(this.state.winner === 'boss' ? 'The Inkling survives. Both communities can try again.' : 'Shared victory. Two communities, one wonderfully bad idea.'); this.setPhase('finished'); this.change();
-  }
+  private finish() { this.setPhase('finished'); this.change(); }
   tick() {
     if (this.state.paused) return; const now = this.clock();
     if (this.state.autoDemo && now >= this.fixtureAt) {
       if (this.state.phase === 'building') { const row = fixtureRounds[this.state.round - 1]?.[this.fixtureIndex]; if (row) { this.ingest({ ...row, id: `${this.state.id}-${this.state.round}-${this.fixtureIndex}`, userId: `demo-${row.name}`, source: 'demo' }); } }
-      else if (this.state.phase === 'voting') for (const id of TEAM_IDS) { const team = this.state.teams[id]; const primary = this.state.round === 1 ? (id === 'a' ? 'soak' : 'catch') : (id === 'a' ? 'ground' : 'reflect'); const candidate = team.finalists.find(f => f.approach.id === primary) ?? team.finalists[0]; if (candidate) this.ingest({ id: randomUUID(), userId: `demo-voter-${this.fixtureIndex}`, name: 'demo-voter', team: id, text: `!vote ${candidate.id}`, source: 'demo' }); };
+      else if (this.state.phase === 'voting') for (const id of TEAM_IDS) { const team = this.state.teams[id]; const primary = this.state.round === 1 ? (id === 'a' ? 'soak' : 'shield') : (id === 'a' ? 'ground' : 'reflect'); const candidate = team.finalists.find(f => f.approach.id === primary) ?? team.finalists[0]; if (candidate) this.ingest({ id: randomUUID(), userId: `demo-voter-${this.fixtureIndex}`, name: 'demo-voter', team: id, text: `!vote ${candidate.id}`, source: 'demo' }); };
       this.fixtureIndex++; this.fixtureAt = now + 800;
     }
     if (this.state.deadline !== null && now >= this.state.deadline) {

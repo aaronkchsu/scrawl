@@ -1,7 +1,7 @@
 import type { Capability, ChatMessage, Creation } from './types.ts';
 
 export function emptyCreation(): Creation {
-  return { name: 'A very good idea, probably', description: 'Your community holds the pencil.', body: 'blank', features: [], capabilities: [], contributions: [], shapes: [], origin: 'demo', generationMs: 0 };
+  return { name: 'No fighter yet', description: 'Waiting for ideas.', body: 'blank', features: [], capabilities: [], contributions: [], shapes: [], origin: 'demo', generationMs: 0 };
 }
 
 // Bound influence by author, not message volume. Keep their most recent two DISTINCT ideas.
@@ -36,6 +36,11 @@ const features: { id: string; label: string; re: RegExp; capability: Capability 
   { id: 'party', label: 'party hat', re: /\b(party|dance|music|distract|hat)\w*/i, capability: 'distract' },
 ];
 
+export function describeDemoCreation(body: string, equipment: string[]): string {
+  const labels = equipment.map(id => features.find(f => f.id === id)?.label ?? id);
+  return `${body[0].toUpperCase() + body.slice(1)}${labels.length ? ` + ${labels.join(' + ')}` : ''}.`;
+}
+
 // Deliberately deterministic demo adapter. Live AI uses its own structured drawing output.
 export function demoCreation(messages: ChatMessage[], previous = emptyCreation()): Creation {
   const balanced = balanceMessages(messages);
@@ -57,7 +62,7 @@ export function demoCreation(messages: ChatMessage[], previous = emptyCreation()
   const names: Record<string, string> = { duck: 'Professor Quack', robot: 'The Questionable Appliance', cat: 'Captain Absolutely Not', frog: 'Sir Hops-a-Lot' };
   return {
     name: names[body], body, features: chosen.map(f => f.id), capabilities: chosen.map(f => f.capability),
-    description: chosen.length ? `${body[0].toUpperCase() + body.slice(1)} + ${chosen.map(f => f.label).join(' + ')}. Chat made this.` : 'A beginning. Give it something ridiculous to work with.',
+    description: describeDemoCreation(body, chosen.map(f => f.id)),
     contributions: contributions.slice(0, 4), shapes: [], origin: 'demo', generationMs: 0,
   };
 }
