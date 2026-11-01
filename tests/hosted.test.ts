@@ -13,7 +13,29 @@ async function account(game: HostedGame, n: number, open = true) {
     await game.channel(String(n), (g, t) => g.setConnection(t, `channel${n}`, 'connected', 'Connected'));
     if (open) await game.action(String(n), { action: 'live', sessionId: game.payload(String(n)).state.id });
 }
-const command = (game: HostedGame, id: string, viewer: string, text: string, delivery: string) => game.channel(id, (g, team) => g.ingest({ id: delivery, team, userId: viewer, source: 'twitch', name: `viewer${viewer}`, text }), delivery, true);
+const command = (game: HostedGame, id: string, viewer: string, text: string, delivery: string) => game.ingest(id, { id: delivery, team: 'a', userId: viewer, source: 'twitch', name: `viewer${viewer}`, text });
+
+test('ordinary chat bypasses saves while game commands remain deduplicated and channel-owned', async (t) => {
+    const { game, store } = fixture(); await account(game, 1); await account(game, 2);
+    const writes = t.mock.method(store, 'transaction');
+    await Promise.all(Array.from({ length: 2000 }, (_, i) => command(game, '1', '91', ['hello', 'wow!', '!digging', '!joiner'][i % 4]!, `chat${i}`)));
+    assert.equal(writes.mock.callCount(), 0); assert.equal(Object.keys(store.read().deliveries).length, 0);
+    await command(game, '1', '91', '  !JOIN  ', 'join');
+    await command(game, '1', '91', '!dig', 'dig'); await command(game, '1', '91', '!dig', 'dig');
+    assert.equal(game.payload('1').state.runs.length, 1); assert.equal(game.payload('2').state.players.length, 0);
+    assert.equal(Object.keys(store.read().deliveries).length, 2);
+});
+
+test('selected reads and room payloads cannot mutate committed progress or expose another camp', async () => {
+    const { game, store } = fixture(); await account(game, 1); await account(game, 2);
+    await command(game, '1', '91', '!join', 'j1'); await command(game, '2', '92', '!join', 'j2');
+    const selected = store.read(d => d.profiles['twitch:91']!); selected.xp = 999;
+    const payload = game.payload('1'); payload.state.players[0]!.xp = 888;
+    assert.equal(game.payload('1').state.players[0]!.xp, 0);
+    assert.doesNotMatch(JSON.stringify(game.payload('1', true)), /viewer92|access-2|refresh-2/);
+    await assert.rejects(store.transaction(d => { d.profiles['twitch:91']!.xp = 777; throw Error('rollback'); }));
+    assert.equal(store.read(d => d.profiles['twitch:91']!.xp), 0);
+});
 
 test('encrypted credentials are authenticated and never appear in host or overlay snapshots', async () => {
     const { game, store } = fixture(); await account(game, 1);
@@ -202,4 +224,56 @@ test('AI allowance is reserved across simultaneous requests and stale generation
         await app.service.completeGeneration(retry, undefined, 'late failure');
         assert.equal(app.service.payload('1').state.caves.job!.status, 'drawing');
     } finally { await app.close(); }
+});
+
+test('multiple OBS windows share frames without sharing host data, and revoked hosts disconnect', async () => {
+    const port = 47000 + Math.floor(Math.random() * 500), base = `http://127.0.0.1:${port}`;
+    const app = await createHostedApp({ BASE_URL: base, TOKEN_ENCRYPTION_KEY: key }, new MemoryHostedStore());
+    await new Promise<void>(r => app.server.listen(port, '127.0.0.1', r));
+    const readers: ReadableStreamDefaultReader<Uint8Array>[] = [];
+    async function open(path: string, cookie = '') {
+        const response = await fetch(base + path, { headers: { Cookie: cookie }, signal: AbortSignal.timeout(5000) });
+        assert.equal(response.status, 200);
+        const reader = response.body!.getReader(); readers.push(reader);
+        const initial = await reader.read(); assert.equal(initial.done, false); return reader;
+    }
+    const frame = async (reader: ReadableStreamDefaultReader<Uint8Array>) => {
+        const value = new TextDecoder().decode((await reader.read()).value);
+        return JSON.parse(value.split('\n')[0]!.slice(6));
+    };
+    try {
+        await account(app.service, 1); await account(app.service, 2);
+        await app.service.change(d => { d.sessions[digest('frame-session')] = { account: '1', expires: Date.now() + 20000 }; });
+        const firstId = app.service.payload('1').state.id, secondId = app.service.payload('2').state.id;
+        const first = app.service.payload('1').account!.overlay, second = app.service.payload('2').account!.overlay;
+        const a = await open('/api/events?channel=' + first), b = await open('/api/events?channel=' + first);
+        const other = await open('/api/events?channel=' + second), host = await open('/api/events', 'scrawl_session=frame-session');
+        const [av, bv, ov, hv] = await Promise.all([a, b, other, host].map(frame));
+        assert.deepEqual(av, bv); assert.equal(av.state.id, firstId); assert.equal(ov.state.id, secondId);
+        assert.equal(av.account, undefined); assert.equal(av.capabilities, undefined); assert.equal(hv.account.id, '1');
+        await app.service.change(d => { delete d.sessions[digest('frame-session')]; });
+        assert.equal((await host.read()).done, true);
+        assert.equal((await frame(a)).state.id, firstId);
+    } finally { await Promise.allSettled(readers.map(r => r.cancel())); await app.close(); }
+});
+
+test('a stalled save marks the server unhealthy and pauses controls instead of reporting success', async (t) => {
+    const port = 48000 + Math.floor(Math.random() * 500), base = `http://127.0.0.1:${port}`;
+    const app = await createHostedApp({ BASE_URL: base, TOKEN_ENCRYPTION_KEY: key }, new MemoryHostedStore());
+    await new Promise<void>(r => app.server.listen(port, '127.0.0.1', r));
+    const originalNow = Date.now;
+    let release!: () => void, started!: () => void;
+    const stalled = new Promise<void>(r => { release = r; }), entered = new Promise<void>(r => { started = r; });
+    t.mock.method(app.service, 'tick', () => { started(); return stalled; });
+    try {
+        const session = await fetch(base + '/api/session', { method: 'POST', headers: { Origin: base } });
+        const cookie = session.headers.get('set-cookie')!.split(';')[0]!;
+        await entered; t.mock.method(Date, 'now', () => originalNow() + 11000);
+        await new Promise(r => setTimeout(r, 550));
+        assert.equal((await fetch(base + '/health')).status, 503);
+        const action = await fetch(base + '/api/action', { method: 'POST', headers: { Origin: base, Cookie: cookie, 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'demo' }) });
+        assert.equal(action.status, 503); assert.match((await action.json() as any).error, /paused/);
+        release();
+        assert.equal((await fetch(base + '/health')).status, 503, 'A late save must not revive an interrupted coordinator.');
+    } finally { release(); t.mock.restoreAll(); await app.close(); }
 });
