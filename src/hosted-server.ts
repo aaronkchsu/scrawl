@@ -31,7 +31,7 @@ export async function createHostedApp(env = process.env, supplied?: HostedStorag
             Object.assign(d.usage, initial, { imported: true });
         }
     });
-    Object.assign(ai, storage.read().usage);
+    Object.assign(ai, storage.read(d => d.usage));
     ai.beforeRequest = () => service.change(d => {
         if (!d.usage.imported) throw new Error('AI usage must be imported before generation is enabled.');
         if (d.usage.requests >= ai.maxRequests) throw new Error('AI cap reached. Built-in caves still work.');
@@ -43,26 +43,27 @@ export async function createHostedApp(env = process.env, supplied?: HostedStorag
     const limits = new Map<string, { count: number; until: number }>();
     const operators = new Set((env.OPERATOR_TWITCH_IDS || '').split(',').filter(Boolean));
     let healthy = true, stopping = false, ticking = false;
+    let lastTickAt = Date.now();
     const pendingJobs = new Set<AbortController>();
     const jobPromises = new Set<Promise<unknown>>();
     function session(req: IncomingMessage) {
         const key = digest(cookie(req).scrawl_session || '');
-        const cached = browsers.get(key), saved = storage.read().sessions[key];
+        const cached = browsers.get(key), saved = storage.read(d => d.sessions[key]);
         if (cached?.account && (!saved || saved.expires <= Date.now())) { browsers.delete(key); return { key, browser: undefined }; }
         if (cached && cached.expires > Date.now()) return { key, browser: cached };
         if (saved && saved.expires > Date.now()) { const browser: BrowserSession = { account: saved.account, expires: saved.expires, practice: false }; browsers.set(key, browser); return { key, browser }; }
         return { key, browser: undefined };
     }
     const capabilities = (account?: string) => {
-        const d = storage.read();
+        const d = storage.read(d => ({ usage: d.usage, enabled: Boolean(account && d.accounts[account]?.aiEnabled) }));
         return { hosted: true, twitch: Boolean(env.TWITCH_CLIENT_ID && env.TWITCH_CLIENT_SECRET), aiRequests: d.usage.requests,
-            ai: { ...ai.status(), ...d.usage, configured: Boolean(account && d.accounts[account]?.aiEnabled && ai.configured && d.usage.imported), enabled: Boolean(account && d.accounts[account]?.aiEnabled) } };
+            ai: { ...ai.status(), ...d.usage, configured: Boolean(d.enabled && ai.configured && d.usage.imported), enabled: d.enabled } };
     };
     function practice(browser: BrowserSession) {
         if (!browser.game) {
             browser.game = new Expedition();
             if (browser.account) {
-                const account = storage.read().accounts[browser.account]!;
+                const account = storage.read(d => d.accounts[browser.account!])!;
                 browser.game.store.profiles = structuredClone(account.practiceProfiles);
                 if (account.practice) browser.game.restore(account.practice, Date.now() - account.practice.savedAt);
             }
@@ -76,19 +77,27 @@ export async function createHostedApp(env = process.env, supplied?: HostedStorag
         return { ...live, authenticated: true, practice: false, capabilities: capabilities(browser.account), healthy };
     }
     function overlayPayload(id: string) {
-        const a = Object.values(storage.read().accounts).find(a => a.overlay === id);
+        const a = storage.read(d => Object.values(d.accounts).find(a => a.overlay === id)?.id);
         if (!a) throw new Error('Overlay not found. Copy your link from Set up stream.');
-        return { ...service.payload(a.id, true), healthy };
+        return { ...service.payload(a, true), healthy };
     }
     function broadcast() {
+        // All windows for the same audience share one frame per committed tick.
+        // Never reuse a host frame for an overlay or a different browser session.
+        const frames = new Map<string, string>();
         for (const [res, target] of streams) {
             try {
+                const frameKey = target.overlay ? `overlay:${target.overlay}` : `browser:${target.key}:${Boolean(target.practice)}`;
+                const cached = frames.get(frameKey);
+                if (res.writableLength > 512000) throw new Error('Reconnect.');
+                if (cached) { res.write(cached); continue; }
                 const browser = target.key ? browsers.get(target.key) : undefined;
-                const saved = browser?.account && storage.read().sessions[target.key!];
+                const saved = browser?.account && storage.read(d => d.sessions[target.key!]);
                 if (browser?.account && (!saved || saved.expires <= Date.now())) throw new Error('Sign in again.');
                 const data = target.overlay ? overlayPayload(target.overlay) : browser ? target.practice ? { state: practice(browser).snapshot(), now: Date.now(), healthy } : payload(browser) : null;
-                if (!data || res.writableLength > 512000) throw new Error('Reconnect.');
-                res.write(`data: ${JSON.stringify(data)}\n\n`);
+                if (!data) throw new Error('Reconnect.');
+                const frame = `data: ${JSON.stringify(data)}\n\n`;
+                frames.set(frameKey, frame); res.write(frame);
             } catch { res.end(); streams.delete(res); }
         }
     }
@@ -103,13 +112,13 @@ export async function createHostedApp(env = process.env, supplied?: HostedStorag
     const background = (promise: Promise<unknown>) => { void promise.catch(interrupted); };
     async function connect(id: string) {
         connections.get(id)?.close(); connections.delete(id);
-        const account = storage.read().accounts[id]; if (!account?.credentials) return;
+        const account = storage.read(d => d.accounts[id]); if (!account?.credentials) return;
         const credentials = service.vault.open<Credentials>(account.credentials);
         const c = new TwitchConnections({ baseUrl,
-            onMessage: m => background(service.channel(id, (g, team) => g.ingest({ ...m, team }), m.id, true)),
+            onMessage: m => { if (!stopping && healthy) background(service.ingest(id, m)); },
             onStatus: (_team, name, status, note) => { if (!stopping && healthy) background(service.channel(id, (g, team) => g.setConnection(team, name || account.login, status, note))); },
-            onHype: e => background(service.channel(id, (g, team) => g.receiveHype({ ...e, team }), e.deliveryId, true)),
-            onGift: e => background(service.channel(id, (g, team) => g.receiveGift({ ...e, team }), e.id, true)),
+            onHype: e => { if (!stopping && healthy) background(service.channel(id, (g, team) => g.receiveHype({ ...e, team }), e.deliveryId, true)); },
+            onGift: e => { if (!stopping && healthy) background(service.channel(id, (g, team) => g.receiveGift({ ...e, team }), e.id, true)); },
             onHypeStatus: (_team, available) => { if (!stopping && healthy) background(service.channel(id, (g, team) => g.setHypeAvailable(team, available))); },
             onGiftStatus: (_team, available) => { if (!stopping && healthy) background(service.channel(id, (g, team) => g.setGiftsAvailable(team, available))); },
             onCredentials: creds => service.change(d => { if (d.accounts[id]?.credentials) d.accounts[id]!.credentials = service.vault.seal(creds); }),
@@ -258,8 +267,11 @@ export async function createHostedApp(env = process.env, supplied?: HostedStorag
         }
     });
     const timer = setInterval(() => {
+        // A stalled database must not leave /health green indefinitely.
+        if (!stopping && healthy && Date.now() - lastTickAt >= 10000) interrupted();
         if (ticking || stopping || !healthy) return; ticking = true;
         void service.tick().then(() => {
+            lastTickAt = Date.now();
             for (const [key, b] of browsers) { if (b.expires < Date.now()) browsers.delete(key); else b.game?.tick(); }
             for (const [key, limit] of limits) if (limit.until < Date.now()) limits.delete(key);
             broadcast();

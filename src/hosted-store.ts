@@ -20,6 +20,7 @@ export const emptyHostedData = (): HostedData => ({ version: 1, accounts: {}, ro
     usage: { requests: 0, reportedRequests: 0, inputTokens: 0, outputTokens: 0, imported: false } });
 export interface HostedStorage {
     read(): HostedData;
+    read<T>(select: (data: HostedData) => T): T;
     transaction<T>(action: (data: HostedData) => T | Promise<T>): Promise<T>;
     close(): Promise<void>;
 }
@@ -28,7 +29,10 @@ export class MemoryHostedStore implements HostedStorage {
     protected data: HostedData;
     protected tail: Promise<unknown> = Promise.resolve();
     constructor(initial = emptyHostedData()) { this.data = structuredClone(initial); }
-    read() { return structuredClone(this.data); }
+    read(): HostedData;
+    read<T>(select: (data: HostedData) => T): T;
+    // Selectors only read committed state. Clone the selection, not every camp.
+    read<T>(select?: (data: HostedData) => T): HostedData | T { return structuredClone(select ? select(this.data) : this.data); }
     transaction<T>(action: (data: HostedData) => T | Promise<T>): Promise<T> {
         const task = this.tail.then(async () => { const next = this.read(); const result = await action(next); this.data = next; return result; });
         this.tail = task.catch(() => {}); return task;
@@ -41,10 +45,12 @@ export class PostgresHostedStore extends MemoryHostedStore {
     constructor(privateClient: DatabaseClient, release: () => Promise<void>) { super(); this.client = privateClient; this.release = release; }
     private client: DatabaseClient;
     private release: () => Promise<void>;
+    private disconnected = false;
     static async connect(url: string) {
-        const pool = new Pool({ connectionString: url, max: 2, connectionTimeoutMillis: 10000 });
+        const pool = new Pool({ connectionString: url, max: 2, connectionTimeoutMillis: 10000, query_timeout: 3000, statement_timeout: 3000 });
         const client = await pool.connect();
         const store = new PostgresHostedStore(client, async () => { client.release(); await pool.end(); });
+        client.on('error', () => { store.disconnected = true; });
         try {
             try { await store.initialize(); }
             catch (error) {
@@ -87,6 +93,7 @@ export class PostgresHostedStore extends MemoryHostedStore {
     }
     override transaction<T>(action: (data: HostedData) => T | Promise<T>): Promise<T> {
         const task = this.tail.then(async () => {
+            if (this.disconnected) throw new Error('Database disconnected. Reconnect after the server restarts.');
             await this.client.query('BEGIN');
             try {
                 const result = await this.client.query(`SELECT data, successor FROM excavation_runtime WHERE id=1 AND owner=$1
