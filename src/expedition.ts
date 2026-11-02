@@ -219,6 +219,7 @@ export class Expedition {
             throw new Error(`${p.name} can climb again in ${Math.ceil(remaining / 1000)}s.`);
         if (this.queue.length >= 100)
             throw new Error('The queue is full. Try again after a climb finishes.');
+        if (this.practice?.done) this.practice = null;
         this.queue.push({ playerId, team: p.team, multiplier: this.multiplier(p.team) });
         this.lastDig.set(playerId, this.clock());
         this.log(`${p.name} is ready to climb.`);

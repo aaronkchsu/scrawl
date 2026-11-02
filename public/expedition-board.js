@@ -67,15 +67,23 @@ export function createBoard(root) {
         });
         const resting = state.players.filter(p => !active.some(r => r.playerId === p.id));
         const shown = resting.slice(-32);
-        const nextKey = JSON.stringify([active.length > 0, state.rescue.camps, shown.map(p => [p.id, p.team, p.name, p.equipped, p.hue, p.xp, p.keepsakes?.length]), state.queue.map(q => q.playerId), Math.floor(now / 1000)]);
+        const nextKey = JSON.stringify([active.length > 0, state.rescue.linked, state.rescue.camps, shown.map(p => [p.id, p.team, p.name, p.equipped, p.hue, p.xp, p.keepsakes?.length]), state.queue.map(q => q.playerId)]);
         if (nextKey !== campKey) {
             campKey = nextKey;
             const width = active.length ? 34 : 46;
             $('.camp-avatars').innerHTML = ['a', 'b'].map((team, ti) => {
                 const members = shown.filter(p => p.team === team);
                 if (!members.length && !state.rescue.linked) return '';
-                return `<span class="camp-label" style="left:${2 + ti * width}%">${team.toUpperCase()} · ${escapeHtml(state.rescue.camps[team])}</span>` + members.map((p, i) => `<div class="camp-viewer" style="--position:${5 + ti * width + i * (width - 9) / Math.max(members.length - 1, 1)}%;--delay:${-i * .37}s">${avatar(p)}<span>${escapeHtml(p.name)}<small class="viewer-next">${state.queue.some(q => q.playerId === p.id) ? '#' + (state.queue.findIndex(q => q.playerId === p.id) + 1) + ' queued' : p.digReadyAt > now ? Math.ceil((p.digReadyAt - now) / 1000) + 's rest' : '!dig'}</small><i class="tiny-xp" style="--xp:${p.xp % 100}%"></i></span></div>`).join('');
+                return `<span class="camp-label" style="left:${2 + ti * width}%">${team.toUpperCase()} · ${escapeHtml(state.rescue.camps[team])}</span>` + members.map((p, i) => `<div class="camp-viewer" data-player="${escapeHtml(p.id)}" style="--position:${5 + ti * width + i * (width - 9) / Math.max(members.length - 1, 1)}%;--delay:${-i * .37}s">${avatar(p)}<span>${escapeHtml(p.name)}<small class="viewer-next"></small><i class="tiny-xp" style="--xp:${p.xp % 100}%"></i></span></div>`).join('');
             }).join('');
+        }
+        // Update countdown text without replacing avatars and restarting their motion.
+        const positions = new Map(state.queue.map((q, i) => [q.playerId, i + 1]));
+        for (const node of $('.camp-avatars').querySelectorAll('.camp-viewer')) {
+            const p = shown.find(p => p.id === node.dataset.player);
+            const next = node.querySelector('.viewer-next');
+            const text = positions.has(p.id) ? '#' + positions.get(p.id) + ' queued' : p.digReadyAt > now ? Math.ceil((p.digReadyAt - now) / 1000) + 's rest' : '!dig';
+            if (next.textContent !== text) next.textContent = text;
         }
         for (const r of active) {
             const bubble = [...$('.climbers').children].find(n => n.dataset.id === r.id)?.querySelector('.choice-bubble');

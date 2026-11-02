@@ -112,7 +112,7 @@ export class HostedGame {
                     game.paused = true; room.open = false; break;
                 case 'settings': {
                     const next = validateSettings(body.settings ?? {}, account.settings);
-                    if (room.members.length > 1 && ['slots', 'roomSeconds'].some(k => (next as any)[k] !== (game.settings as any)[k])) throw new Error('Climber count and pace stay fixed while camps are linked.');
+                    if (room.members.length > 1 && ['slots', 'roomSeconds'].some(k => Object.hasOwn(body.settings ?? {}, k) && (next as any)[k] !== (game.settings as any)[k])) throw new Error('Climber count and pace stay fixed while camps are linked.');
                     account.settings = next; game.campSettings[team] = next;
                     if (room.members.length === 1) game.settings = { ...next };
                     if (!next.giftRocks) { game.cancelRocks(team); for (const run of game.runs.filter(r => r.team === team)) run.giftRocks = false; }
