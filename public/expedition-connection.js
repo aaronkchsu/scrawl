@@ -6,20 +6,22 @@ export async function request(path, body) {
     return data;
 }
 export function connectState(onState, onConnection) {
-    let source, disposed = false;
+    let disposed = false, connected;
+    const report = value => { if (connected !== value) { connected = value; onConnection(value); } };
     const params = new URLSearchParams(location.search);
     const suffix = location.pathname === '/overlay' ? '?' + new URLSearchParams([...params].filter(([k]) => ['channel', 'practice'].includes(k))).toString() : '';
-    fetch('/api/state' + suffix).then(r => { if (!r.ok)
-        throw new Error(); return r.json(); }).then(onState).catch(() => onConnection(false));
-    source = new EventSource('/api/events' + suffix);
+    // The event stream sends a full snapshot immediately, including on reconnect.
+    // A separate fetch could arrive late and overwrite that newer snapshot.
+    const source = new EventSource('/api/events' + suffix);
     source.onmessage = event => { if (disposed)
         return; try {
-        onState(JSON.parse(event.data));
-        onConnection(true);
+        const snapshot = JSON.parse(event.data);
+        onState(snapshot);
+        report(snapshot.healthy !== false);
     }
     catch {
-        onConnection(false);
+        report(false);
     } };
-    source.onerror = () => onConnection(false);
+    source.onerror = () => { if (!disposed) report(false); };
     return () => { disposed = true; source?.close(); };
 }
