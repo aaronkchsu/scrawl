@@ -64,3 +64,67 @@
 .cave-overlay-labels{position:absolute;right:28%;top:4%;max-width:23%;display:flex;flex-direction:column;gap:.8cqw;z-index:6;pointer-events:none}.cave-overlay-labels>div{border-right:.15cqw solid #e8b956;padding:.5cqw .8cqw;background:#161616e8;color:#eee}.cave-overlay-labels b{display:block;font-size:1.1cqw;margin:.3cqw 0}.cave-overlay-labels span{display:block;font-size:.75cqw;line-height:1.4}.cave-overlay-labels small{display:block;font-size:.6cqw;line-height:1.5;color:#bdb8aa;margin-top:.3cqw}.expedition-board[data-side=left] .cave-overlay-labels{right:auto;left:28%}
 
 .viewer-next{display:block;font-size:.52cqw;line-height:1.2;color:#d2cfc7}
+
+/* The climb floats over the video, just like the camp at the bottom.
+   Keep opacity on small labels, never on an enclosing panel or the sprites. */
+.expedition-board { --shaft-width: 18%; }
+.shaft {
+  top: 14%;
+  bottom: 11%;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.shaft::before, .rock-wall { display: none; }
+.shaft-heading, .shaft-base {
+  background: transparent;
+  border: 0;
+  text-shadow: 0 1px 3px #000, 0 0 2px #000;
+}
+.shaft-heading { font-size: .65cqw; padding: 0 8%; }
+.shaft-heading b { font-size: 1.5cqw; }
+.shaft-base { font-size: .6cqw; }
+.shaft-rooms { left: 0; right: 0; }
+.shaft-room .ledge {
+  left: 10%;
+  width: 80%;
+  height: .22cqw;
+  border: 0;
+  border-radius: 0;
+  background: linear-gradient(to right, #d4d8cd99 0 28%, transparent 28% 36%, #d4d8cd99 36% 64%, transparent 64% 72%, #d4d8cd99 72%);
+  box-shadow: 0 1px 2px #0009;
+}
+.floor-number { color: #d0d0c6; font-size: .6cqw; text-shadow: 0 1px 3px #000; }
+.climber .avatar { width: 2.3cqw; height: 2.3cqw; filter: drop-shadow(0 1px 2px #000b); }
+.climber-name { font-size: .6cqw; max-width: 4.6cqw; }
+.hearts { font-size: .65cqw; }
+.loot-pill { font-size: .56cqw; }
+.choice-bubble { font-size: .5cqw; min-width: 4.6cqw; padding: .3cqw .2cqw; }
+.hyped .shaft { animation: none; border: 0; box-shadow: none; }
+.hyped .shaft-heading { background: transparent; }
+.hyped .shaft-room .ledge { background: linear-gradient(to right, #ebbb5acc 0 28%, transparent 28% 36%, #ebbb5acc 36% 64%, transparent 64% 72%, #ebbb5acc 72%); }
+.moment, .gift-event, .rescue-moment, .supply-route {
+  background: #121914a3;
+  box-shadow: none;
+  border-radius: 0;
+  text-shadow: 0 1px 2px #000;
+}
+.moment { max-width: 34%; padding: .45cqw .65cqw; font-size: .8cqw; border-width: 0 0 0 .15cqw; }
+.rescue-supplies, .rescue-moment { width: 34%; }
+.rescue-moment { padding: .55cqw .75cqw; border-left-width: .2cqw; }
+.rescue-moment strong { font-size: 1.15cqw; margin: .3cqw 0; }
+.rescue-moment small { font-size: .6cqw; }
+.rescue-moment > span, .supply-label { font-size: .7cqw; }
+.supply-route { padding: .4cqw .6cqw; }
+.show-rescue .rescue-supplies { bottom: 40%; }
+.gift-events { width: 27%; }
+.gift-event { padding: .5cqw .7cqw; }
+.gift-event strong { font-size: 1.2cqw; }
+.gift-event p { font-size: .7cqw; }
+.gift-event.gift-burst { background: #302217b3; }
+.hype-banner > span { background: #e8b956cc; padding: .4cqw .65cqw; border: 0; }
+.hype-banner b { font-size: 1.3cqw; }
+.cave-overlay-labels { right: 22%; }
+.cave-overlay-labels > div { background: #161616a3; }
+.expedition-board[data-side=left] .cave-overlay-labels { left: 22%; }
