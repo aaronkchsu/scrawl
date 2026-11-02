@@ -106,6 +106,11 @@ test('one rescue each way grants a persistent cosmetic with both camps and peopl
         const restored = new ProfileStore(file);
         assert.deepEqual(restored.profiles['demo:noodle']!.keepsakes, [keepsake]);
         assert.deepEqual(restored.profiles['demo:mossboss']!.keepsakes, [keepsake]);
+        f.game.dig('demo:peach');
+        assert.equal(f.game.practice, null, 'Starting a normal climb exits the finished tutorial.');
+        assert.equal(f.game.runs[0]!.floor, 0);
+        assert.notEqual(f.game.runs[0]!.rooms[3]!.chance, 1);
+        assert.equal(f.game.players.get('demo:noodle')!.keepsakes!.length, 1);
         f.game.setMode('demo'); assert.equal(f.game.rescueLine.keepsake, null);
         assert.equal(f.game.players.get('demo:noodle')!.keepsakes!.length, 1);
         // Invalid nested records must not silently overwrite a save.

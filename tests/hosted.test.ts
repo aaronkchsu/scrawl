@@ -75,6 +75,19 @@ test('invites expire, active climbs cannot link, and capacity leaves free practi
     await assert.rejects(game.accept('2', next), /current climbs/);
 });
 
+test('paired streamers with different solo settings can change their own event settings', async () => {
+    const { game } = fixture(); await account(game, 1); await account(game, 2);
+    await game.action('2', { action: 'settings', sessionId: game.payload('2').state.id, settings: { slots: 1, roomSeconds: 8 } });
+    await game.accept('2', await game.invite('1'));
+    const shared = game.payload('2').state.settings;
+    await game.action('2', { action: 'settings', sessionId: game.payload('2').state.id, settings: { giftRocks: true } });
+    assert.equal(game.payload('2').state.settings.giftRocks, true);
+    assert.equal(game.payload('1').state.settings.giftRocks, false);
+    assert.equal(game.payload('2').state.settings.slots, shared.slots);
+    assert.equal(game.payload('2').state.settings.roomSeconds, shared.roomSeconds);
+    await assert.rejects(game.action('2', { action: 'settings', sessionId: game.payload('2').state.id, settings: { slots: 1 } }), /fixed/);
+});
+
 test('restarts preserve climbs without downtime hazards, deduplicate deliveries and bank simultaneous rewards once', async () => {
     const f = fixture(); for (const n of [1, 2]) await account(f.game, n);
     for (const n of [1, 2]) { await command(f.game, String(n), '92', '!join', `j${n}`); await command(f.game, String(n), '92', '!dig', `d${n}`); }
@@ -188,7 +201,7 @@ test('OAuth binds one-use state to the browser, validates Twitch identity, and r
 test('Postgres load persists 10 camps and 1,000 viewers without rewriting inventories on idle ticks', async () => {
     const pg = new PGlite(); let entityWrites = 0;
     const db = new PostgresHostedStore({ query: (sql, values) => { if (sql.startsWith('INSERT INTO excavation_entities')) entityWrites++; return pg.query(sql, values); } }, async () => {});
-    await db.initialize(); const game = new HostedGame(db, new TokenVault(key));
+    await db.initialize(); let now = Date.now(); const game = new HostedGame(db, new TokenVault(key), 10, () => now);
     try {
         for (let n = 1; n <= 10; n++) {
             await account(game, n); await game.channel(String(n), (g, team) => {
@@ -198,10 +211,33 @@ test('Postgres load persists 10 camps and 1,000 viewers without rewriting invent
         }
         const before = entityWrites, start = performance.now(); await game.tick();
         assert.equal(entityWrites, before); console.log(`Postgres 10-room idle tick: ${Math.round(performance.now() - start)}ms, zero inventory writes.`);
+        for (let n = 1; n <= 10; n++) await game.action(String(n), { action: 'pause', sessionId: game.payload(String(n)).state.id });
+        const timings: number[] = [];
+        // Advance through real floors, held choices, automatic keeps, and queue turnover.
+        // Include the two snapshots each camp serves to its host and OBS every tick.
+        for (let step = 0; step < 45; step++) {
+            now += 5000; const began = performance.now(); await game.tick();
+            for (let n = 1; n <= 10; n++) for (const overlay of [false, true]) {
+                const snapshot = game.payload(String(n), overlay);
+                assert.equal(snapshot.state.players.length, 100);
+                assert.ok(snapshot.state.runs.length <= 3);
+                assert.ok(snapshot.state.players.every(p => Math.floor(Number(p.id.slice('twitch:'.length)) / 1000) === n));
+                JSON.stringify(snapshot);
+            }
+            timings.push(performance.now() - began);
+        }
+        const saved = db.read();
+        assert.ok(Object.values(saved.profiles).filter(p => p.ore > 0).length >= 30, 'Every camp must complete and bank climbs under load.');
+        assert.ok(Object.values(saved.rooms).every(r => r.game.queue.length < 97), 'Each queue must keep advancing.');
+        const sorted = timings.toSorted((a, b) => a - b), p95 = sorted[Math.floor(sorted.length * .95)]!;
+        console.log(`Postgres active load: 10 rooms / 1,000 viewers / 20 snapshots; p95 ${Math.round(p95)}ms, max ${Math.round(sorted.at(-1)!)}ms.`);
+        assert.ok(p95 < 500, 'Active ticks and snapshots should fit the 500ms update interval.');
         await db.close();
         const restored = new PostgresHostedStore({ query: (sql, values) => pg.query(sql, values) }, async () => {}); await restored.initialize();
         assert.equal(Object.keys(restored.read().profiles).length, 1000); assert.equal(Object.keys(restored.read().rooms).length, 10);
-        assert.equal(Object.values(restored.read().rooms).every(r => r.game.queue.length === 100), true);
+        assert.deepEqual(restored.read().profiles, saved.profiles);
+        const durableRooms = (rooms: unknown) => JSON.parse(JSON.stringify(rooms, (key, value) => key === 'savedAt' ? undefined : value));
+        assert.deepEqual(durableRooms(restored.read().rooms), durableRooms(saved.rooms));
         await restored.close();
     } finally { await pg.close(); }
 });
